@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ReactComponent as PlayButton } from "./assets/playButton.svg";
 
 // import short videos
 import caterpillarVideo from "./assets/caterpillar.mp4";
@@ -30,13 +31,23 @@ function App() {
           }
      ]);
      const currentVideo = videos.filter(({ show }) => show);
+     const [videoIsPlaying, setVideoIsPlaying] = useState(false);
      const [end, setEnd] = useState(false);
 
-     function playPauseCurrentVideo() {
+     function playPauseCurrentVideo(event) {
+          // stop the event from going to the parent
+          event.stopPropagation();
+
           const videoBeingShownCurrently = videos.find(({ show }) => show);
           const videoElement = document.getElementById(`video-${videoBeingShownCurrently.name}`);
 
-          return videoElement.paused ? videoElement.play() : videoElement.pause();
+          if (videoElement.paused) {
+               videoElement.play();
+               setVideoIsPlaying(true);
+          } else {
+               videoElement.pause();
+               setVideoIsPlaying(false);
+          }
      }
 
      function playNextVideo() {
@@ -73,20 +84,23 @@ function App() {
           <>
                {/* Render Videos */}
                {currentVideo.map(({ name, src, show }) => (
-                    <video key={name} id={`video-${name}`} className={!show ? "hidden" : ""} src={src}></video>
+                    <video key={name} id={`video-${name}`} className={!show ? "hidden" : ""} src={src} muted></video>
                ))}
 
                {/* custom controls */}
-               <div id="controls">
-                    <button id="previous-button" onClick={playPreviousVideo}>
+               <div id="control-wrapper" onClick={playPauseCurrentVideo}>
+                    <div id="control-bar"></div>
+                    {/* <button id="previous-button" onClick={playPreviousVideo}>
                          Previous Video
-                    </button>
-                    <button id="play-button" onClick={playPauseCurrentVideo}>
-                         Play / Pause Video
-                    </button>
-                    <button id="next-button" onClick={playNextVideo}>
+                    </button> */}
+                    {!videoIsPlaying && (
+                         <div id="main-play-button" onClick={playPauseCurrentVideo}>
+                              <PlayButton />
+                         </div>
+                    )}
+                    {/* <button id="next-button" onClick={playNextVideo}>
                          Next Video
-                    </button>
+                    </button> */}
                </div>
 
                {/* End screen */}

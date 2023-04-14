@@ -34,13 +34,25 @@ body.wrapper video {
 body.wrapper video.hidden {
   display: none;
 }
-body.wrapper #controls {
+body.wrapper #control-wrapper {
   position: absolute;
   z-index: 2;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   inset: 0;
+}
+body.wrapper #control-wrapper #main-play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  scale: 1;
+}
+body.wrapper #control-wrapper #main-play-button :hover {
+  transition: scale 300ms;
+  scale: 1.1;
+}
+body.wrapper #control-wrapper #main-play-button svg :hover {
+  scale: 1;
 }
 body.wrapper #end-screen {
   position: absolute;
