@@ -22,7 +22,6 @@ body {
 }
 body.wrapper {
   outline: 1px solid red;
-  overflow: none;
 }
 body.wrapper video {
   height: 100vh;

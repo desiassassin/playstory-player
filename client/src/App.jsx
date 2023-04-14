@@ -6,8 +6,6 @@ import fishVideo from "./assets/fish.mp4";
 import noiseVideo from "./assets/noise.mp4";
 import rabbitVideo from "./assets/rabbit.mp4";
 
-// const VIDEOS = ;
-
 function App() {
      const [videos, setVideos] = useState([
           {
@@ -31,6 +29,7 @@ function App() {
                show: false
           }
      ]);
+     const currentVideo = videos.filter(({ show }) => show);
      const [end, setEnd] = useState(false);
 
      function playPauseCurrentVideo() {
@@ -73,7 +72,7 @@ function App() {
      return (
           <>
                {/* Render Videos */}
-               {videos.map(({ name, src, show }) => (
+               {currentVideo.map(({ name, src, show }) => (
                     <video key={name} id={`video-${name}`} className={!show ? "hidden" : ""} src={src}></video>
                ))}
 
