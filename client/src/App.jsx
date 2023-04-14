@@ -31,7 +31,7 @@ function App() {
                show: false
           }
      ]);
-     const [end, setEnd] = useState(true);
+     const [end, setEnd] = useState(false);
 
      function playPauseCurrentVideo() {
           const videoBeingShownCurrently = videos.find(({ show }) => show);
@@ -43,9 +43,28 @@ function App() {
      function playNextVideo() {
           const indexOfCurrentVideo = videos.findIndex(({ show }) => show);
 
+          // this is the last video
+          if (indexOfCurrentVideo === videos.length - 1) return setEnd(true);
+
+          // display the next video
           setVideos((previousState) => {
                previousState[indexOfCurrentVideo].show = false;
                previousState[indexOfCurrentVideo + 1].show = true;
+
+               return [...previousState];
+          });
+     }
+
+     function playPreviousVideo() {
+          const indexOfCurrentVideo = videos.findIndex(({ show }) => show);
+
+          // this is the first video
+          if (indexOfCurrentVideo === 0) return;
+
+          // display the previous video
+          setVideos((previousState) => {
+               previousState[indexOfCurrentVideo].show = false;
+               previousState[indexOfCurrentVideo - 1].show = true;
 
                return [...previousState];
           });
@@ -55,12 +74,12 @@ function App() {
           <>
                {/* Render Videos */}
                {videos.map(({ name, src, show }) => (
-                    <video key={name} id={`video-${name}`} className={`${!show && "hidden"}`} src={src}></video>
+                    <video key={name} id={`video-${name}`} className={!show ? "hidden" : ""} src={src}></video>
                ))}
 
                {/* custom controls */}
                <div id="controls">
-                    <button id="previous-button" onClick={(event) => console.log("previous")}>
+                    <button id="previous-button" onClick={playPreviousVideo}>
                          Previous Video
                     </button>
                     <button id="play-button" onClick={playPauseCurrentVideo}>
@@ -72,7 +91,7 @@ function App() {
                </div>
 
                {/* End screen */}
-               <div id="end-screen" className={end && "show"}>
+               <div id="end-screen" className={end ? "show" : ""}>
                     Interactive video has ended. Reload the page.
                </div>
           </>
