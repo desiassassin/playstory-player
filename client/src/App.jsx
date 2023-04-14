@@ -41,11 +41,10 @@ function App() {
 
      useEffect(() => {
           const updateTrackBarInterval = setInterval(() => {
-               const video = document.getElementById(`video-${currentVideo.name}`);
+               const { currentTime, duration, paused } = document.getElementById(`video-${currentVideo.name}`);
                const trackbar = document.getElementById("track-bar");
-               const { currentTime, duration, paused } = video;
 
-               if (!paused) trackbar.value = (currentTime / duration) * 100;
+               if (!paused) trackbar.value = Math.ceil((currentTime / duration) * 100);
           }, 100);
 
           return () => {
@@ -99,6 +98,13 @@ function App() {
           });
      }
 
+     function seekVideo(event) {
+          const { max, value } = event.target;
+          const video = document.getElementById(`video-${currentVideo.name}`);
+          const seekPoint = value / max;
+          video.currentTime = video.duration * seekPoint;
+     }
+
      return (
           <>
                {/* Render Videos */}
@@ -115,7 +121,7 @@ function App() {
                <div id="control-wrapper" onClick={playPauseCurrentVideo}>
                     <div id="control-bar" onClick={(event) => event.stopPropagation()}>
                          <RestartButton id="restart-button" />
-                         <input id="track-bar" type="range" min={0} max={100} step={1} />
+                         <input id="track-bar" type="range" min={0} max={100} step={1} onChange={seekVideo} />
                          {videoIsMuted ? (
                               <MutedButton id="muted-button" onClick={() => setVideoIsMuted(false)} />
                          ) : (
