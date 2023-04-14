@@ -32,6 +32,13 @@ function App() {
           }
      ]);
 
+     function playPauseCurrentVideo() {
+          const videoBeingShownCurrently = videos.find(({ show }) => show);
+          const videoElement = document.getElementById(`video-${videoBeingShownCurrently.name}`);
+
+          return videoElement.paused ? videoElement.play() : videoElement.pause();
+     }
+
      return (
           <>
                {/* Render Videos */}
@@ -41,9 +48,15 @@ function App() {
 
                {/* custom controls */}
                <div className="controls">
-                    <button id="play-button">Previous Video</button>
-                    <button id="play-button">Play Video</button>
-                    <button id="play-button">Next Video</button>
+                    <button id="previous-button" onClick={(event) => console.log("previous")}>
+                         Previous Video
+                    </button>
+                    <button id="play-button" onClick={playPauseCurrentVideo}>
+                         Play / Pause Video
+                    </button>
+                    <button id="next-button" onClick={(event) => console.log("next")}>
+                         Next Video
+                    </button>
                </div>
           </>
      );
