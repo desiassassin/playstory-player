@@ -23,9 +23,6 @@ body {
      &.wrapper {
           outline: 1px solid red;
           overflow: none;
-          //   display: flex;
-          //   align-items: center;
-          //   justify-content: center;
 
           video {
                $height: 100vh;
@@ -41,15 +38,27 @@ body {
                }
           }
 
-          .controls {
+          #controls {
                position: absolute;
-               top: 50%;
                z-index: 2;
                display: flex;
                justify-content: space-between;
-               width: 100%;
+               align-items: center;
+               inset: 0;
+          }
 
-               button {
+          #end-screen {
+               position: absolute;
+               z-index: 10;
+               inset: 0;
+
+               backdrop-filter: blur(10px);
+               background-color: rgba(0, 0, 0, 0.25);
+               display: none;
+
+               &.show {
+                    display: grid;
+                    place-items: center;
                }
           }
      }

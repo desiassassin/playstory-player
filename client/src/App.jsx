@@ -31,12 +31,24 @@ function App() {
                show: false
           }
      ]);
+     const [end, setEnd] = useState(true);
 
      function playPauseCurrentVideo() {
           const videoBeingShownCurrently = videos.find(({ show }) => show);
           const videoElement = document.getElementById(`video-${videoBeingShownCurrently.name}`);
 
           return videoElement.paused ? videoElement.play() : videoElement.pause();
+     }
+
+     function playNextVideo() {
+          const indexOfCurrentVideo = videos.findIndex(({ show }) => show);
+
+          setVideos((previousState) => {
+               previousState[indexOfCurrentVideo].show = false;
+               previousState[indexOfCurrentVideo + 1].show = true;
+
+               return [...previousState];
+          });
      }
 
      return (
@@ -47,16 +59,21 @@ function App() {
                ))}
 
                {/* custom controls */}
-               <div className="controls">
+               <div id="controls">
                     <button id="previous-button" onClick={(event) => console.log("previous")}>
                          Previous Video
                     </button>
                     <button id="play-button" onClick={playPauseCurrentVideo}>
                          Play / Pause Video
                     </button>
-                    <button id="next-button" onClick={(event) => console.log("next")}>
+                    <button id="next-button" onClick={playNextVideo}>
                          Next Video
                     </button>
+               </div>
+
+               {/* End screen */}
+               <div id="end-screen" className={end && "show"}>
+                    Interactive video has ended. Reload the page.
                </div>
           </>
      );
