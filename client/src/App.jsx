@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ReactComponent as PlayButton } from "./assets/svg/playButton.svg";
 import { ReactComponent as RestartButton } from "./assets/svg/restartButton.svg";
 import { ReactComponent as MutedButton } from "./assets/svg/mutedButton.svg";
@@ -38,19 +38,6 @@ function App() {
      const [videoIsPlaying, setVideoIsPlaying] = useState(false);
      const [videoIsMuted, setVideoIsMuted] = useState(false);
      const [end, setEnd] = useState(false);
-
-     useEffect(() => {
-          const updateTrackBarInterval = setInterval(() => {
-               const { currentTime, duration, paused } = document.getElementById(`video-${currentVideo.name}`);
-               const trackbar = document.getElementById("track-bar");
-
-               if (!paused) trackbar.value = Math.ceil((currentTime / duration) * 100);
-          }, 100);
-
-          return () => {
-               clearInterval(updateTrackBarInterval);
-          };
-     }, []);
 
      function playPauseCurrentVideo(event) {
           // stop the event from going to the parent
@@ -98,25 +85,38 @@ function App() {
           });
      }
 
+     function updateTrackbarWhileVideoIsPlaying(event) {
+          const { currentTime, duration, paused } = event.target;
+          const trackbar = document.getElementById("track-bar");
+
+          if (!paused) trackbar.value = Math.ceil((currentTime / duration) * 100);
+     }
+
      function seekVideo(event) {
           const { max, value } = event.target;
           const video = document.getElementById(`video-${currentVideo.name}`);
-          const seekPoint = value / max;
-          video.currentTime = video.duration * seekPoint;
+          const seekPoint = (value / max).toFixed(2);
+          video.currentTime = (video.duration * seekPoint).toFixed(3);
      }
 
      return (
           <>
                {/* Render Videos */}
-               {/* {currentVideo.map(({ name, src, show }) => ( */}
                <video
-                    // key={currentVideo.name}
                     id={`video-${currentVideo.name}`}
                     className={!currentVideo.show ? "hidden" : ""}
                     src={currentVideo.src}
                     muted
+                    onTimeUpdate={updateTrackbarWhileVideoIsPlaying}
+                    onLoadedData={(event) => {
+                         document.getElementById("track-bar").value = 0;
+                    }}
+                    onEnded={(event) => {
+                         const trackbar = document.getElementById("track-bar");
+                         trackbar.value = trackbar.max;
+                    }}
                ></video>
-               {/* ))} */}
+
                {/* custom controls */}
                <div id="control-wrapper" onClick={playPauseCurrentVideo}>
                     <div id="control-bar" onClick={(event) => event.stopPropagation()}>
@@ -129,18 +129,13 @@ function App() {
                          )}
                          <FullscreenButton id="fullscreen-button" />
                     </div>
-                    {/* <button id="previous-button" onClick={playPreviousVideo}>
-                         Previous Video
-                    </button> */}
                     {!videoIsPlaying && (
                          <div id="play-button" onClick={playPauseCurrentVideo}>
                               <PlayButton />
                          </div>
                     )}
-                    {/* <button id="next-button" onClick={playNextVideo}>
-                         Next Video
-                    </button> */}
                </div>
+
                {/* End screen */}
                <div id="end-screen" className={end ? "show" : ""}>
                     Interactive video has ended. Reload the page.
