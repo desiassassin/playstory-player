@@ -92,6 +92,14 @@ function App() {
           if (!paused) trackbar.value = Math.ceil((currentTime / duration) * 100);
      }
 
+     function restartVideo() {
+          const video = document.getElementById(`video-${currentVideo.name}`);
+          const trackbar = document.getElementById("track-bar");
+
+          video.currentTime = 0;
+          trackbar.value = 0;
+     }
+
      function seekVideo(event) {
           const { max, value } = event.target;
           const video = document.getElementById(`video-${currentVideo.name}`);
@@ -110,6 +118,29 @@ function App() {
           return !document.fullscreenElement ? document.documentElement.requestFullscreen() : document.exitFullscreen();
      }
 
+     function toggleControlBar(event) {
+          const controlBar = document.getElementById("control-bar");
+          const [from, to] = [{}, {}];
+          const animationOptions = {
+               duration: 150,
+               fill: "forwards"
+          };
+
+          // onMouseEnter
+          if (event.type === "mouseenter") {
+               from.opacity = "0";
+               to.opacity = "1";
+          }
+
+          // onMouseLeave
+          if (event.type === "mouseleave") {
+               from.opacity = "1";
+               to.opacity = "0";
+          }
+
+          controlBar.animate([from, to], animationOptions);
+     }
+
      return (
           <>
                {/* Render Videos */}
@@ -118,19 +149,19 @@ function App() {
                     className={!currentVideo.show ? "hidden" : ""}
                     src={currentVideo.src}
                     onTimeUpdate={updateTrackbarWhileVideoIsPlaying}
-                    onLoadedData={(event) => {
+                    onLoadedData={() => {
                          document.getElementById("track-bar").value = 0;
                     }}
-                    onEnded={(event) => {
+                    onEnded={() => {
                          const trackbar = document.getElementById("track-bar");
                          trackbar.value = trackbar.max;
                     }}
                ></video>
 
                {/* custom controls */}
-               <div id="control-wrapper" onClick={playPauseCurrentVideo}>
+               <div id="control-wrapper" onClick={playPauseCurrentVideo} onMouseEnter={toggleControlBar} onMouseLeave={toggleControlBar}>
                     <div id="control-bar" onClick={(event) => event.stopPropagation()}>
-                         <RestartButton id="restart-button" />
+                         <RestartButton id="restart-button" onClick={restartVideo} />
                          <input id="track-bar" type="range" min={0} max={100} step={1} onChange={seekVideo} />
                          {videoIsMuted ? (
                               <MutedButton id="muted-button" onClick={toggleMute} />
