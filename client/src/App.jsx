@@ -99,11 +99,15 @@ function App() {
           video.currentTime = (video.duration * seekPoint).toFixed(3);
      }
 
-     function muteToggle() {
+     function toggleMute() {
           const video = document.getElementById(`video-${currentVideo.name}`);
           video.volume = videoIsMuted ? 1 : 0;
 
           setVideoIsMuted((previousState) => !previousState);
+     }
+
+     function toggleFullScreen() {
+          return !document.fullscreenElement ? document.documentElement.requestFullscreen() : document.exitFullscreen();
      }
 
      return (
@@ -129,11 +133,11 @@ function App() {
                          <RestartButton id="restart-button" />
                          <input id="track-bar" type="range" min={0} max={100} step={1} onChange={seekVideo} />
                          {videoIsMuted ? (
-                              <MutedButton id="muted-button" onClick={muteToggle} />
+                              <MutedButton id="muted-button" onClick={toggleMute} />
                          ) : (
-                              <SoundButton id="sound-button" onClick={muteToggle} />
+                              <SoundButton id="sound-button" onClick={toggleMute} />
                          )}
-                         <FullscreenButton id="fullscreen-button" />
+                         <FullscreenButton id="fullscreen-button" onClick={toggleFullScreen} />
                     </div>
                     {!videoIsPlaying && (
                          <div id="play-button" onClick={playPauseCurrentVideo}>
