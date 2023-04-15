@@ -91,18 +91,16 @@ body.wrapper #options {
   left: 50%;
   bottom: 1rem;
   translate: -50%;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
   gap: 1rem;
-  justify-content: space-between;
-  align-items: start;
-  flex-wrap: wrap;
   padding-block: 2rem;
 }
 body.wrapper #options .option {
   display: flex;
   align-items: center;
   gap: 1rem;
-  width: 250px;
+  width: 275px;
   background-color: black;
   padding: 0.25rem 1rem;
   border-radius: 100px;
