@@ -49,6 +49,7 @@ body {
                     align-items: flex-start;
                     gap: 1rem;
                     background-image: linear-gradient(rgba(0, 0, 0, 0.5), transparent);
+                    opacity: 0;
 
                     #track-bar {
                          flex-grow: 1;

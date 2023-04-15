@@ -39,7 +39,7 @@ function App() {
      const [videoIsMuted, setVideoIsMuted] = useState(false);
      const [end, setEnd] = useState(false);
 
-     function playPauseCurrentVideo(event) {
+     function playPause(event) {
           // stop the event from going to the parent
           event.stopPropagation();
 
@@ -85,7 +85,7 @@ function App() {
           });
      }
 
-     function updateTrackbarWhileVideoIsPlaying(event) {
+     function updateTrackbar(event) {
           const { currentTime, duration, paused } = event.target;
           const trackbar = document.getElementById("track-bar");
 
@@ -96,8 +96,11 @@ function App() {
           const video = document.getElementById(`video-${currentVideo.name}`);
           const trackbar = document.getElementById("track-bar");
 
+          // reset trackbar, video and play the video
           video.currentTime = 0;
           trackbar.value = 0;
+          video.play();
+          setVideoIsPlaying(true);
      }
 
      function seekVideo(event) {
@@ -120,35 +123,30 @@ function App() {
 
      function toggleControlBar(event) {
           const controlBar = document.getElementById("control-bar");
-          const [from, to] = [{}, {}];
+          const video = document.getElementById(`video-${currentVideo.name}`);
+          const [from, to] = [{ opacity: controlBar.style.opacity }, {}];
           const animationOptions = {
-               duration: 150,
+               duration: 250,
                fill: "forwards"
           };
 
-          // onMouseEnter
-          if (event.type === "mouseenter") {
-               from.opacity = "0";
-               to.opacity = "1";
-          }
+          // onMouseEnter | keep the controlbar hidden until the video starts
+          if (event.type === "mouseenter") to.opacity = video.currentTime === 0 ? "0" : "1";
 
-          // onMouseLeave
-          if (event.type === "mouseleave") {
-               from.opacity = "1";
-               to.opacity = "0";
-          }
+          // onMouseLeave | always hide the controlbar when mouse moves out
+          if (event.type === "mouseleave") to.opacity = "0";
 
           controlBar.animate([from, to], animationOptions);
      }
 
      return (
           <>
-               {/* Render Videos */}
+               {/* Render video */}
                <video
                     id={`video-${currentVideo.name}`}
                     className={!currentVideo.show ? "hidden" : ""}
                     src={currentVideo.src}
-                    onTimeUpdate={updateTrackbarWhileVideoIsPlaying}
+                    onTimeUpdate={updateTrackbar}
                     onLoadedData={() => {
                          document.getElementById("track-bar").value = 0;
                     }}
@@ -159,7 +157,7 @@ function App() {
                ></video>
 
                {/* custom controls */}
-               <div id="control-wrapper" onClick={playPauseCurrentVideo} onMouseEnter={toggleControlBar} onMouseLeave={toggleControlBar}>
+               <div id="control-wrapper" onClick={playPause} onMouseEnter={toggleControlBar} onMouseLeave={toggleControlBar}>
                     <div id="control-bar" onClick={(event) => event.stopPropagation()}>
                          <RestartButton id="restart-button" onClick={restartVideo} />
                          <input id="track-bar" type="range" min={0} max={100} step={1} onChange={seekVideo} />
@@ -171,7 +169,7 @@ function App() {
                          <FullscreenButton id="fullscreen-button" onClick={toggleFullScreen} />
                     </div>
                     {!videoIsPlaying && (
-                         <div id="play-button" onClick={playPauseCurrentVideo}>
+                         <div id="play-button">
                               <PlayButton />
                          </div>
                     )}

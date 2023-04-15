@@ -45,6 +45,7 @@ body.wrapper #control-wrapper #control-bar {
   align-items: flex-start;
   gap: 1rem;
   background-image: linear-gradient(rgba(0, 0, 0, 0.5), transparent);
+  opacity: 0;
 }
 body.wrapper #control-wrapper #control-bar #track-bar {
   flex-grow: 1;
