@@ -53,6 +53,9 @@ function App() {
                videoElement.pause();
                setVideoIsPlaying(false);
           }
+
+          const controlBar = document.getElementById("control-bar");
+          controlBar.animate([{ opacity: "0" }, { opacity: "1" }], { duration: 150, fill: "forwards" });
      }
 
      function playNextVideo() {
@@ -126,12 +129,18 @@ function App() {
           const video = document.getElementById(`video-${currentVideo.name}`);
           const [from, to] = [{ opacity: controlBar.style.opacity }, {}];
           const animationOptions = {
-               duration: 250,
+               duration: 150,
                fill: "forwards"
           };
 
           // onMouseEnter | keep the controlbar hidden until the video starts
-          if (event.type === "mouseenter") to.opacity = video.currentTime === 0 ? "0" : "1";
+          if (event.type === "mouseover") {
+               if (video.currentTime === 0) {
+                    to.opacity = "0";
+               } else {
+                    to.opacity = "1";
+               }
+          }
 
           // onMouseLeave | always hide the controlbar when mouse moves out
           if (event.type === "mouseleave") to.opacity = "0";
@@ -157,7 +166,7 @@ function App() {
                ></video>
 
                {/* custom controls */}
-               <div id="control-wrapper" onClick={playPause} onMouseEnter={toggleControlBar} onMouseLeave={toggleControlBar}>
+               <div id="control-wrapper" onClick={playPause} onMouseLeave={toggleControlBar} onMouseOver={toggleControlBar}>
                     <div id="control-bar" onClick={(event) => event.stopPropagation()}>
                          <RestartButton id="restart-button" onClick={restartVideo} />
                          <input id="track-bar" type="range" min={0} max={100} step={1} onChange={seekVideo} />
@@ -169,9 +178,12 @@ function App() {
                          <FullscreenButton id="fullscreen-button" onClick={toggleFullScreen} />
                     </div>
                     {!videoIsPlaying && (
-                         <div id="play-button">
-                              <PlayButton />
-                         </div>
+                         <>
+                              <div id="play-button">
+                                   <PlayButton />
+                                   <h1 id="start-text">Begin an interactive conversation.</h1>
+                              </div>
+                         </>
                     )}
                </div>
 

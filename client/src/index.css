@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
 :root {
   font-size: 16px;
 }
@@ -61,12 +62,26 @@ body.wrapper #control-wrapper #play-button {
   transform: translate(-50%, -50%);
   cursor: pointer;
   scale: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
 }
 body.wrapper #control-wrapper #play-button :hover {
-  transition: scale 300ms;
+  transition: scale 150ms;
   scale: 1.1;
 }
 body.wrapper #control-wrapper #play-button svg :hover {
+  scale: 1;
+}
+body.wrapper #control-wrapper #play-button #start-text {
+  font-size: 18px;
+  width: -moz-max-content;
+  width: max-content;
+  font-family: "Poppins", "san-serif";
+  font-weight: normal;
+}
+body.wrapper #control-wrapper #play-button #start-text:hover {
   scale: 1;
 }
 body.wrapper #end-screen {
