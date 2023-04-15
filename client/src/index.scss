@@ -97,6 +97,55 @@ body {
                }
           }
 
+          #options {
+               width: clamp(300px, 100%, 900px);
+
+               position: absolute;
+               z-index: 3;
+               left: 50%;
+               bottom: 1rem;
+               translate: -50%;
+
+               display: flex;
+               gap: 1rem;
+               justify-content: space-between;
+               align-items: start;
+               flex-wrap: wrap;
+
+               padding-block: 2rem;
+
+               .option {
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    width: 250px;
+
+                    background-color: black;
+                    padding: 0.25rem 1rem;
+                    border-radius: 100px;
+
+                    margin: auto;
+
+                    .option-number {
+                         $size: 30px;
+                         min-height: $size;
+                         min-width: $size;
+                         display: flex;
+                         justify-content: center;
+                         align-items: center;
+                         border-radius: 50%;
+                         background-color: #fff;
+                         color: black;
+                         font-weight: bold;
+                         font-size: 1.25rem;
+                    }
+
+                    .option-title {
+                         font-family: "Poppins", "san-serif";
+                    }
+               }
+          }
+
           #end-screen {
                position: absolute;
                z-index: 10;

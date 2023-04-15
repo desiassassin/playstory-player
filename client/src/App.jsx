@@ -16,22 +16,26 @@ function App() {
           {
                name: "caterpillar",
                src: caterpillarVideo,
-               show: true
+               show: true,
+               options: [{ title: "I'm just looking" }, { title: "What's this?" }, { title: "What's that?" }, { title: "Sorry, I'm not interested" }]
           },
           {
                name: "fish",
                src: fishVideo,
-               show: false
+               show: false,
+               options: []
           },
           {
                name: "rabbit",
                src: rabbitVideo,
-               show: false
+               show: false,
+               options: []
           },
           {
                name: "noise",
                src: noiseVideo,
-               show: false
+               show: false,
+               options: []
           }
      ]);
      const [currentVideo] = videos.filter(({ show }) => show);
@@ -185,6 +189,17 @@ function App() {
                               </div>
                          </>
                     )}
+               </div>
+
+               <div id="options">
+                    {currentVideo.options.map(({ title }, index) => {
+                         return (
+                              <div className="option">
+                                   <span className="option-number">{index + 1}</span>
+                                   <p className="option-title">{title}</p>
+                              </div>
+                         );
+                    })}
                </div>
 
                {/* End screen */}

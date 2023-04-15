@@ -84,6 +84,45 @@ body.wrapper #control-wrapper #play-button #start-text {
 body.wrapper #control-wrapper #play-button #start-text:hover {
   scale: 1;
 }
+body.wrapper #options {
+  width: clamp(300px, 100%, 900px);
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 1rem;
+  translate: -50%;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: start;
+  flex-wrap: wrap;
+  padding-block: 2rem;
+}
+body.wrapper #options .option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 250px;
+  background-color: black;
+  padding: 0.25rem 1rem;
+  border-radius: 100px;
+  margin: auto;
+}
+body.wrapper #options .option .option-number {
+  min-height: 30px;
+  min-width: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background-color: #fff;
+  color: black;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+body.wrapper #options .option .option-title {
+  font-family: "Poppins", "san-serif";
+}
 body.wrapper #end-screen {
   position: absolute;
   z-index: 10;
