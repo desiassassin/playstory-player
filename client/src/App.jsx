@@ -99,6 +99,13 @@ function App() {
           video.currentTime = (video.duration * seekPoint).toFixed(3);
      }
 
+     function muteToggle() {
+          const video = document.getElementById(`video-${currentVideo.name}`);
+          video.volume = videoIsMuted ? 1 : 0;
+
+          setVideoIsMuted((previousState) => !previousState);
+     }
+
      return (
           <>
                {/* Render Videos */}
@@ -106,7 +113,6 @@ function App() {
                     id={`video-${currentVideo.name}`}
                     className={!currentVideo.show ? "hidden" : ""}
                     src={currentVideo.src}
-                    muted
                     onTimeUpdate={updateTrackbarWhileVideoIsPlaying}
                     onLoadedData={(event) => {
                          document.getElementById("track-bar").value = 0;
@@ -123,9 +129,9 @@ function App() {
                          <RestartButton id="restart-button" />
                          <input id="track-bar" type="range" min={0} max={100} step={1} onChange={seekVideo} />
                          {videoIsMuted ? (
-                              <MutedButton id="muted-button" onClick={() => setVideoIsMuted(false)} />
+                              <MutedButton id="muted-button" onClick={muteToggle} />
                          ) : (
-                              <SoundButton id="sound-button" onClick={() => setVideoIsMuted(true)} />
+                              <SoundButton id="sound-button" onClick={muteToggle} />
                          )}
                          <FullscreenButton id="fullscreen-button" />
                     </div>
