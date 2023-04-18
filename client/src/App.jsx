@@ -59,7 +59,7 @@ function App() {
           }
 
           const controlBar = document.getElementById("control-bar");
-          controlBar.animate([{ opacity: "0" }, { opacity: "1" }], { duration: 150, fill: "forwards" });
+          controlBar.animate([{ opacity: controlBar.style.opacity }, { opacity: "1" }], { duration: 150, fill: "forwards" });
      }
 
      function playNextVideo() {
@@ -137,6 +137,8 @@ function App() {
                fill: "forwards"
           };
 
+          console.log(event.type);
+
           // onMouseEnter | keep the controlbar hidden until the video starts
           if (event.type === "mouseover") {
                if (video.currentTime === 0) {
@@ -185,7 +187,7 @@ function App() {
                          <>
                               <div id="play-button">
                                    <PlayButton />
-                                   <h1 id="start-text">Begin an interactive conversation.</h1>
+                                   <h1 id="start-text">Begin the interactive conversation.</h1>
                               </div>
                          </>
                     )}
