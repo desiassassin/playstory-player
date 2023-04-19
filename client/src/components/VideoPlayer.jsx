@@ -15,10 +15,10 @@ import { useRef } from "react";
 export default function PlaystoryPlayer() {
      const { playstoryID } = useParams();
      const [playstory, setPlaystory] = useState();
-     const [loading, setLoading] = useState(false);
+     const [loading, setLoading] = useState(true);
      const [showEndScreen, setShowEndScreen] = useState(false);
      const [reactPlayerProps, setReactPlayerProps] = useState({
-          url: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8",
+          url: "",
           playing: false,
           volume: 1,
           muted: false,
@@ -36,24 +36,34 @@ export default function PlaystoryPlayer() {
                video.onmouseout = hideControlBar;
           }
 
-          //  (async function () {
-          //       const response = await axios({ url: `${BASE_URL}/api/playstory/${playstoryID}` });
-
-          //       if (response.data.success === true) {
-          //            setPlaystory(response.data);
-          //            setLoading(false);
-
-          //            /* Uncomment the code below to show playstory clip */
-          //            // const url = response.data.to_show_now.data.clip.url;
-          //            //  const baseURL = VIDEO_SERVER_URL;
-          //            // setReactPlayerProps(previousState => ({...previousState, url: `${baseURL}${url}`}));
-          //       }
-          //  })();
-
           return function () {
-               if (video) video.onclick = null;
+               if (video) {
+                    video.onclick = null;
+                    video.onmouseenter = null;
+                    video.onmouseout = null;
+               }
           };
      }, [playstory, loading, reactPlayerProps]);
+
+     useEffect(() => {
+          (async function () {
+               const response = await axios({ url: `${BASE_URL}/api/playstory/${playstoryID}` });
+
+               if (response.data.success === true) {
+                    response.data.to_show_now.data.clip.url =
+                         "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8";
+
+                    setPlaystory(response.data);
+                    setReactPlayerProps((previousState) => ({ ...previousState, url: response.data.to_show_now.data.clip.url }));
+                    setLoading(false);
+
+                    /* Uncomment the code below to show playstory clip */
+                    // const url = response.data.to_show_now.data.clip.url;
+                    //  const baseURL = VIDEO_SERVER_URL;
+                    // setReactPlayerProps(previousState => ({...previousState, url: `${baseURL}${url}`}));
+               }
+          })();
+     }, []);
 
      function play() {
           setReactPlayerProps((previousState) => ({ ...previousState, playing: true }));
@@ -87,6 +97,15 @@ export default function PlaystoryPlayer() {
           trackbar.value = event.playedSeconds;
      }
 
+     function showHideOptions(event) {
+          const options = document.getElementById("options");
+          const duration = PlayerRef.current.getDuration();
+          const timeToShowButtons = (playstory.to_show_now.data.show_after_percent / 100) * duration;
+          const shouldShowButtons = event.playedSeconds >= timeToShowButtons;
+
+          shouldShowButtons ? options.classList.add("show") : options.classList.remove("show");
+     }
+
      function videoEnded() {
           setShowEndScreen(true);
      }
@@ -114,7 +133,10 @@ export default function PlaystoryPlayer() {
                     style={{ overflow: "hidden", zIndex: "1", position: "absolute", objectFit: "cover" }}
                     {...reactPlayerProps}
                     onDuration={updateTrackbarOnLoad}
-                    onProgress={updateTrackbar}
+                    onProgress={(event) => {
+                         updateTrackbar(event);
+                         showHideOptions(event);
+                    }}
                     onEnded={videoEnded}
                />
 
@@ -136,16 +158,16 @@ export default function PlaystoryPlayer() {
                     </PlayButtonWrapper>
                )}
 
-               {/* <Options>
-               {[{ title: "I'm just looking" }, { title: "What's this?" }, { title: "What's that?" }, { title: "Sorry, I'm not interested" }].map(({ title }, index) => {
+               <Options id="options">
+                    {playstory?.to_show_now.data.options.map(({ id, value }, index) => {
                          return (
-                              <div className="option">
+                              <div key={id} className="option">
                                    <span className="option-number">{index + 1}</span>
-                                   <p className="option-title">{title}</p>
+                                   <p className="option-title">{value}</p>
                               </div>
                          );
                     })}
-               </Options> */}
+               </Options>
 
                {showEndScreen && <EndScreen>Interactive video has ended.</EndScreen>}
           </Wrapper>
@@ -219,11 +241,15 @@ const Options = styled.div`
      left: 50%;
      bottom: 1rem;
      translate: -50%;
-     display: grid;
+     display: none;
      grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
      gap: 1rem;
 
      padding-block: 2rem;
+
+     &.show {
+          display: grid;
+     }
 
      .option {
           display: flex;
