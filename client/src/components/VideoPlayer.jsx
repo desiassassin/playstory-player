@@ -104,7 +104,7 @@ export default function PlaystoryPlayer() {
      }
 
      function showHideOptions(event) {
-          const options = document.getElementById("options");
+          const options = document.getElementById("options-wrapper");
           const duration = PlayerRef.current.getDuration();
           const timeToShowButtons = (playstory.to_show_now.data.show_after_percent / 100) * duration;
           const shouldShowButtons = event.playedSeconds >= timeToShowButtons;
@@ -158,7 +158,7 @@ export default function PlaystoryPlayer() {
                </ControlBar>
 
                {!reactPlayerProps.playing && (
-                    <PlayButtonWrapper onClick={play} color={playstory?.videoTextColor}>
+                    <PlayButtonWrapper onClick={play} customStyles={{color: playstory?.videoTextColor}}>
                          <PlayButton />
                          <h1 id="welcome-text" className="hidden">
                               {playstory?.welcomeText || "Begin an interactive conversation"}
@@ -167,17 +167,20 @@ export default function PlaystoryPlayer() {
                )}
 
                <Options
-                    id="options"
-                    customStyles={{ opacity: playstory?.btnOpacity, backgroundColor: playstory?.btnColor, color: playstory?.textColor }}
+                    id="options-wrapper"
+                    customStyles={{ opacity: playstory?.btnOpacity, backgroundColor: playstory?.btnColor, color: playstory?.textColor, videoTextColor: playstory?.videoTextColor }}
                >
-                    {playstory?.to_show_now.data.options.map(({ id, value }, index) => {
-                         return (
-                              <div key={id} className="option">
-                                   <span className="option-number">{index + 1}</span>
-                                   <p className="option-title">{value}</p>
-                              </div>
-                         );
-                    })}
+                    <h1 id="video-heading">{playstory?.to_show_now.data.video_title}</h1>
+                    <div id="options">
+                         {playstory?.to_show_now.data.options.map(({ id, value }, index) => {
+                              return (
+                                   <div key={id} className="option">
+                                        <span className="option-number">{index + 1}</span>
+                                        <p className="option-title">{value}</p>
+                                   </div>
+                              );
+                         })}
+                    </div>
                </Options>
 
                {showEndScreen && <EndScreen>Interactive video has ended.</EndScreen>}
@@ -240,7 +243,7 @@ const PlayButtonWrapper = styled.div`
           font-size: 18px;
           width: max-content;
           font-weight: normal;
-          color: ${(props) => (props.color ? props.color : "white")};
+          color: ${(props) => (props.customStyles.color ? props.customStyles.color : "white")};
           user-select: none;
 
           &.hidden {
@@ -250,52 +253,61 @@ const PlayButtonWrapper = styled.div`
 `;
 
 const Options = styled.div`
-     width: clamp(300px, 100%, 900px);
-     position: absolute;
      z-index: 2;
      left: 50%;
-     bottom: 1rem;
+     bottom: 20%;
      translate: -50%;
      display: none;
-     grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
-     gap: 1rem;
-
-     padding-block: 2rem;
+     position: absolute;
+     width: clamp(300px, 100%, 1200px);
+     /* padding-block: 2rem; */
 
      &.show {
-          display: grid;
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
      }
 
-     .option {
-          display: flex;
-          align-items: center;
+     #video-heading {
+        text-align: center;
+        color: ${props => props.customStyles.videoTextColor ? props.customStyles.videoTextColor : "white"};
+        font-size: 1.5rem;
+     }
+
+     #options {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+          padding-inline: 1rem;
           gap: 1rem;
-          width: 275px;
-          background-color: ${(props) => (props.customStyles.backgroundColor ? props.customStyles.backgroundColor : "black")};
-          padding: 0.25rem 1rem;
-          border-radius: 100px;
 
-          margin: auto;
-
-          .option-number {
-               --size: 30px;
-               min-height: var(--size);
-               min-width: var(--size);
+          .option {
                display: flex;
-               justify-content: center;
                align-items: center;
-               border-radius: 50%;
-               /* background-color: #fff;
-               color: black; */
-               background-color: ${props => props.customStyles.color ? props.customStyles.color : "white"};
-               color: ${props => props.customStyles.backgroundColor ? props.customStyles.backgroundColor : "black"};
-               font-weight: bold;
-               font-size: 1.25rem;
-          }
+               gap: 1rem;
+               width: 275px;
+               background-color: ${(props) => (props.customStyles.backgroundColor ? props.customStyles.backgroundColor : "black")};
+               padding: 0.25rem 1rem;
+               border-radius: 100px;
+               margin: auto;
+               opacity: ${(props) => (props.customStyles.opacity ? props.customStyles.opacity : 1)};
 
-          .option-title {
-               /* color: white; */
-               color: ${(props) => (props.customStyles.color ? props.customStyles.color : "white")};
+               .option-number {
+                    --size: 30px;
+                    min-height: var(--size);
+                    min-width: var(--size);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border-radius: 50%;
+                    background-color: ${(props) => (props.customStyles.color ? props.customStyles.color : "white")};
+                    color: ${(props) => (props.customStyles.backgroundColor ? props.customStyles.backgroundColor : "black")};
+                    font-weight: bold;
+                    font-size: 1.25rem;
+               }
+
+               .option-title {
+                    color: ${(props) => (props.customStyles.color ? props.customStyles.color : "white")};
+               }
           }
      }
 `;
