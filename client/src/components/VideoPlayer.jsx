@@ -73,7 +73,7 @@ export default function PlaystoryPlayer() {
           showControlBar();
 
           // hide welcome text
-          document.getElementById("welcome-text").classList.add("hidden")
+          document.getElementById("welcome-text").classList.add("hidden");
      }
 
      function pause() {
@@ -158,13 +158,18 @@ export default function PlaystoryPlayer() {
                </ControlBar>
 
                {!reactPlayerProps.playing && (
-                    <PlayButtonWrapper onClick={play}>
+                    <PlayButtonWrapper onClick={play} color={playstory?.videoTextColor}>
                          <PlayButton />
-                         <h1 id="welcome-text" className="hidden">{playstory?.welcomeText || "Begin an interactive conversation"}</h1>
+                         <h1 id="welcome-text" className="hidden">
+                              {playstory?.welcomeText || "Begin an interactive conversation"}
+                         </h1>
                     </PlayButtonWrapper>
                )}
 
-               <Options id="options">
+               <Options
+                    id="options"
+                    customStyles={{ opacity: playstory?.btnOpacity, backgroundColor: playstory?.btnColor, color: playstory?.textColor }}
+               >
                     {playstory?.to_show_now.data.options.map(({ id, value }, index) => {
                          return (
                               <div key={id} className="option">
@@ -235,11 +240,11 @@ const PlayButtonWrapper = styled.div`
           font-size: 18px;
           width: max-content;
           font-weight: normal;
-          color: white;
+          color: ${(props) => (props.color ? props.color : "white")};
           user-select: none;
 
           &.hidden {
-            display: none;
+               display: none;
           }
      }
 `;
@@ -266,8 +271,7 @@ const Options = styled.div`
           align-items: center;
           gap: 1rem;
           width: 275px;
-
-          background-color: black;
+          background-color: ${(props) => (props.customStyles.backgroundColor ? props.customStyles.backgroundColor : "black")};
           padding: 0.25rem 1rem;
           border-radius: 100px;
 
@@ -281,14 +285,17 @@ const Options = styled.div`
                justify-content: center;
                align-items: center;
                border-radius: 50%;
-               background-color: #fff;
-               color: black;
+               /* background-color: #fff;
+               color: black; */
+               background-color: ${props => props.customStyles.color ? props.customStyles.color : "white"};
+               color: ${props => props.customStyles.backgroundColor ? props.customStyles.backgroundColor : "black"};
                font-weight: bold;
                font-size: 1.25rem;
           }
 
           .option-title {
-               color: white;
+               /* color: white; */
+               color: ${(props) => (props.customStyles.color ? props.customStyles.color : "white")};
           }
      }
 `;
