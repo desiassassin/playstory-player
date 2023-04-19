@@ -57,6 +57,9 @@ export default function PlaystoryPlayer() {
                     setReactPlayerProps((previousState) => ({ ...previousState, url: response.data.to_show_now.data.clip.url }));
                     setLoading(false);
 
+                    // show the welcome text
+                    document.getElementById("welcome-text").classList.remove("hidden");
+
                     /* Uncomment the code below to show playstory clip */
                     // const url = response.data.to_show_now.data.clip.url;
                     //  const baseURL = VIDEO_SERVER_URL;
@@ -68,6 +71,9 @@ export default function PlaystoryPlayer() {
      function play() {
           setReactPlayerProps((previousState) => ({ ...previousState, playing: true }));
           showControlBar();
+
+          // hide welcome text
+          document.getElementById("welcome-text").classList.add("hidden")
      }
 
      function pause() {
@@ -154,7 +160,7 @@ export default function PlaystoryPlayer() {
                {!reactPlayerProps.playing && (
                     <PlayButtonWrapper onClick={play}>
                          <PlayButton />
-                         <h1 id="start-text">Begin an interactive conversation.</h1>
+                         <h1 id="welcome-text" className="hidden">{playstory?.welcomeText || "Begin an interactive conversation"}</h1>
                     </PlayButtonWrapper>
                )}
 
@@ -225,12 +231,16 @@ const PlayButtonWrapper = styled.div`
           cursor: pointer;
      }
 
-     #start-text {
+     #welcome-text {
           font-size: 18px;
           width: max-content;
           font-weight: normal;
           color: white;
           user-select: none;
+
+          &.hidden {
+            display: none;
+          }
      }
 `;
 
