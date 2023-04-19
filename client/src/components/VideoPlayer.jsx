@@ -47,23 +47,27 @@ export default function PlaystoryPlayer() {
 
      useEffect(() => {
           (async function () {
-               const response = await axios({ url: `${BASE_URL}/api/playstory/${playstoryID}` });
+               try {
+                    const response = await axios({ url: `${BASE_URL}/api/playstory/${playstoryID}`, method: "GET" });
 
-               if (response.data.success === true) {
-                    response.data.to_show_now.data.clip.url =
-                         "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8";
+                    if (response.data.success === true) {
+                         response.data.to_show_now.data.clip.url =
+                              "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8";
 
-                    setPlaystory(response.data);
-                    setReactPlayerProps((previousState) => ({ ...previousState, url: response.data.to_show_now.data.clip.url }));
-                    setLoading(false);
+                         setPlaystory(response.data);
+                         setReactPlayerProps((previousState) => ({ ...previousState, url: response.data.to_show_now.data.clip.url }));
+                         setLoading(false);
 
-                    // show the welcome text
-                    document.getElementById("welcome-text").classList.remove("hidden");
+                         // show the welcome text
+                         document.getElementById("welcome-text").classList.remove("hidden");
 
-                    /* Uncomment the code below to show playstory clip */
-                    // const url = response.data.to_show_now.data.clip.url;
-                    //  const baseURL = VIDEO_SERVER_URL;
-                    // setReactPlayerProps(previousState => ({...previousState, url: `${baseURL}${url}`}));
+                         /* Uncomment the code below to show playstory clip */
+                         // const url = response.data.to_show_now.data.clip.url;
+                         //  const baseURL = VIDEO_SERVER_URL;
+                         // setReactPlayerProps(previousState => ({...previousState, url: `${baseURL}${url}`}));
+                    }
+               } catch (error) {
+                    console.log(error.message);
                }
           })();
      }, []);
@@ -113,7 +117,9 @@ export default function PlaystoryPlayer() {
      }
 
      function videoEnded() {
-          setShowEndScreen(true);
+          if (playstory.to_show_now.type === "end") {
+               setShowEndScreen(true);
+          }
      }
 
      function showControlBar() {
@@ -126,6 +132,35 @@ export default function PlaystoryPlayer() {
 
           const controlBar = document.getElementById("control-bar");
           controlBar.style.visibility = "hidden";
+     }
+
+     async function submitAnswer(event) {
+          const { id: optionID } = event.currentTarget.dataset;
+
+          try {
+               const response = await axios({
+                    url: `${BASE_URL}/api/answers-add`,
+                    method: "POST",
+                    data: { playstoryID: playstory.playstoryID, optionID }
+               });
+
+               if (response.data.success === true) {
+                    if (response.data.to_show_now.type === "clip") {
+                         response.data.to_show_now.data.clip.url =
+                              "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8";
+
+                         setPlaystory(response.data);
+                         setReactPlayerProps((previousState) => ({ ...previousState, url: response.data.to_show_now.data.clip.url }));
+                    } else if (response.data.to_show_now.type === "end") {
+                         const duration = PlayerRef.current.getDuration();
+                         PlayerRef.current.seekTo(duration, "seconds");
+                         setPlaystory(response.data);
+                         setShowEndScreen(true);
+                    }
+               }
+          } catch (error) {
+               console.log(error.message);
+          }
      }
 
      return (
@@ -158,7 +193,7 @@ export default function PlaystoryPlayer() {
                </ControlBar>
 
                {!reactPlayerProps.playing && (
-                    <PlayButtonWrapper onClick={play} customStyles={{color: playstory?.videoTextColor}}>
+                    <PlayButtonWrapper onClick={play} customStyles={{ color: playstory?.videoTextColor }}>
                          <PlayButton />
                          <h1 id="welcome-text" className="hidden">
                               {playstory?.welcomeText || "Begin an interactive conversation"}
@@ -168,22 +203,28 @@ export default function PlaystoryPlayer() {
 
                <Options
                     id="options-wrapper"
-                    customStyles={{ opacity: playstory?.btnOpacity, backgroundColor: playstory?.btnColor, color: playstory?.textColor, videoTextColor: playstory?.videoTextColor }}
+                    customStyles={{
+                         opacity: playstory?.btnOpacity,
+                         backgroundColor: playstory?.btnColor,
+                         color: playstory?.textColor,
+                         videoTextColor: playstory?.videoTextColor
+                    }}
                >
                     <h1 id="video-heading">{playstory?.to_show_now.data.video_title}</h1>
                     <div id="options">
-                         {playstory?.to_show_now.data.options.map(({ id, value }, index) => {
-                              return (
-                                   <div key={id} className="option">
-                                        <span className="option-number">{index + 1}</span>
-                                        <p className="option-title">{value}</p>
-                                   </div>
-                              );
-                         })}
+                         {playstory?.to_show_now.type !== "end" &&
+                              playstory?.to_show_now.data.options.map(({ id, value }, index) => {
+                                   return (
+                                        <div key={id} className="option" onClick={submitAnswer} data-id={id}>
+                                             <span className="option-number">{index + 1}</span>
+                                             <p className="option-title">{value}</p>
+                                        </div>
+                                   );
+                              })}
                     </div>
                </Options>
 
-               {showEndScreen && <EndScreen>Interactive video has ended.</EndScreen>}
+               {showEndScreen && <EndScreen>{playstory?.to_show_now.data.text || "Interactive video has ended."}</EndScreen>}
           </Wrapper>
      );
 }
@@ -269,9 +310,10 @@ const Options = styled.div`
      }
 
      #video-heading {
-        text-align: center;
-        color: ${props => props.customStyles.videoTextColor ? props.customStyles.videoTextColor : "white"};
-        font-size: 1.5rem;
+          text-align: center;
+          color: ${(props) => (props.customStyles.videoTextColor ? props.customStyles.videoTextColor : "white")};
+          font-size: 1.5rem;
+          pointer-events: none;
      }
 
      #options {
@@ -290,6 +332,7 @@ const Options = styled.div`
                border-radius: 100px;
                margin: auto;
                opacity: ${(props) => (props.customStyles.opacity ? props.customStyles.opacity : 1)};
+               cursor: pointer;
 
                .option-number {
                     --size: 30px;
