@@ -12,6 +12,12 @@ import { ReactComponent as SoundButton } from "../assets/svg/soundButton.svg";
 import Loader from "./Loader";
 import { useRef } from "react";
 
+const VIDEOS = [
+     "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8",
+     "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8",
+     "http://d3rlna7iyyu8wu.cloudfront.net/skip_armstrong/skip_armstrong_multi_language_subs.m3u8"
+];
+
 export default function PlaystoryPlayer() {
      const { playstoryID } = useParams();
      const [playstory, setPlaystory] = useState();
@@ -152,9 +158,8 @@ export default function PlaystoryPlayer() {
                          setPlaystory(response.data);
                          setReactPlayerProps((previousState) => ({ ...previousState, url: response.data.to_show_now.data.clip.url }));
                     } else if (response.data.to_show_now.type === "end") {
-                         const duration = PlayerRef.current.getDuration();
-                         PlayerRef.current.seekTo(duration, "seconds");
                          setPlaystory(response.data);
+                         setReactPlayerProps((previousState) => ({ ...previousState, playing: false }));
                          setShowEndScreen(true);
                     }
                }
@@ -224,7 +229,11 @@ export default function PlaystoryPlayer() {
                     </div>
                </Options>
 
-               {showEndScreen && <EndScreen>{playstory?.to_show_now.data.text || "Interactive video has ended."}</EndScreen>}
+               {showEndScreen && (
+                    <EndScreen customStyles={{ videoTextColor: playstory.videoTextColor }}>
+                         {playstory?.to_show_now.data.text || "Interactive video has ended."}
+                    </EndScreen>
+               )}
           </Wrapper>
      );
 }
@@ -359,9 +368,9 @@ const EndScreen = styled.div`
      position: absolute;
      z-index: 4;
      inset: 0;
-     backdrop-filter: blur(10px);
-     background-color: rgba(0, 0, 0, 0.25);
-     color: white;
+     backdrop-filter: blur(50px);
+     background-color: rgba(0, 0, 0, 0.9);
+     color: ${(props) => (props.customStyles.videoTextColor ? props.customStyles.videoTextColor : "white")};
      display: grid;
      place-items: center;
 `;
