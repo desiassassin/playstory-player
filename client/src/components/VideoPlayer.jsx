@@ -49,7 +49,7 @@ export default function PlaystoryPlayer() {
                     video.onmouseout = null;
                }
           };
-     }, [playstory, loading, reactPlayerProps]);
+     }, [playstory, reactPlayerProps]);
 
      useEffect(() => {
           (async function () {
@@ -57,8 +57,7 @@ export default function PlaystoryPlayer() {
                     const response = await axios({ url: `${BASE_URL}/api/playstory/${playstoryID}`, method: "GET" });
 
                     if (response.data.success === true) {
-                         response.data.to_show_now.data.clip.url =
-                              "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8";
+                         response.data.to_show_now.data.clip.url = VIDEOS[Math.floor(Math.random() * VIDEOS.length)];
 
                          setPlaystory(response.data);
                          setReactPlayerProps((previousState) => ({ ...previousState, url: response.data.to_show_now.data.clip.url }));
@@ -152,11 +151,14 @@ export default function PlaystoryPlayer() {
 
                if (response.data.success === true) {
                     if (response.data.to_show_now.type === "clip") {
-                         response.data.to_show_now.data.clip.url =
-                              "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8";
+                         const { url: currentVideoURL } = reactPlayerProps;
+                         const nextURLs = VIDEOS.filter((videoURL) => videoURL !== currentVideoURL);
+                         const nextVideoURL = nextURLs[Math.floor(Math.random() * nextURLs.length)];
+
+                         response.data.to_show_now.data.clip.url = nextVideoURL;
 
                          setPlaystory(response.data);
-                         setReactPlayerProps((previousState) => ({ ...previousState, url: response.data.to_show_now.data.clip.url }));
+                         setReactPlayerProps((previousState) => ({ ...previousState, url: nextVideoURL }));
                     } else if (response.data.to_show_now.type === "end") {
                          setPlaystory(response.data);
                          setReactPlayerProps((previousState) => ({ ...previousState, playing: false }));
