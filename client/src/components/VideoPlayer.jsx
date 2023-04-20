@@ -53,33 +53,39 @@ export default function PlaystoryPlayer() {
 
      useEffect(() => {
           (async function () {
-               try {
-                    const response = await axios({ url: `${BASE_URL}/api/playstory/${playstoryID}`, method: "GET" });
+               if (!playstory) {
+                    try {
+                         const response = await axios({ url: `${BASE_URL}/api/playstory/${playstoryID}`, method: "GET" });
 
-                    if (response.data.success === true) {
-                         response.data.to_show_now.data.clip.url = VIDEOS[Math.floor(Math.random() * VIDEOS.length)];
+                         if (response.data.success === true) {
+                              response.data.to_show_now.data.clip.url = VIDEOS[Math.floor(Math.random() * VIDEOS.length)];
+                              setPlaystory(response.data);
+                              setReactPlayerProps((previousState) => ({ ...previousState, url: response.data.to_show_now.data.clip.url }));
 
-                         setPlaystory(response.data);
-                         setReactPlayerProps((previousState) => ({ ...previousState, url: response.data.to_show_now.data.clip.url }));
+                              // show the welcome text
+                              document.getElementById("welcome-text").classList.remove("hidden");
+
+                              /* Uncomment the code below and remove every thing above this line to show playstory clip */
+                              /*
+                                const nextClipURL = response.data.to_show_now.data.clip.url;
+                                setPlaystory(response.data);
+                                setReactPlayerProps((previousState) => ({ ...previousState, url: `${VIDEO_SERVER_URL}${nextClipURL}` }));
+
+                                // show the welcome text
+                                document.getElementById("welcome-text").classList.remove("hidden");
+                                */
+                         }
+                    } catch (error) {
+                         console.log(error.message);
+                    } finally {
                          setLoading(false);
-
-                         // show the welcome text
-                         document.getElementById("welcome-text").classList.remove("hidden");
-
-                         /* Uncomment the code below to show playstory clip */
-                         // const url = response.data.to_show_now.data.clip.url;
-                         //  const baseURL = VIDEO_SERVER_URL;
-                         // setReactPlayerProps(previousState => ({...previousState, url: `${baseURL}${url}`}));
                     }
-               } catch (error) {
-                    console.log(error.message);
                }
           })();
      }, []);
 
      function play() {
           setReactPlayerProps((previousState) => ({ ...previousState, playing: true }));
-          showControlBar();
 
           // hide welcome text
           document.getElementById("welcome-text").classList.add("hidden");
@@ -133,7 +139,7 @@ export default function PlaystoryPlayer() {
      }
 
      function hideControlBar(event) {
-          if (event.toElement?.id === "control-bar") return;
+          if (event.relatedTarget) return;
 
           const controlBar = document.getElementById("control-bar");
           controlBar.style.visibility = "hidden";
@@ -141,12 +147,15 @@ export default function PlaystoryPlayer() {
 
      async function submitAnswer(event) {
           const { id: optionID } = event.currentTarget.dataset;
+          const { playstoryID } = playstory;
+
+          setLoading(true);
 
           try {
                const response = await axios({
                     url: `${BASE_URL}/api/answers-add`,
                     method: "POST",
-                    data: { playstoryID: playstory.playstoryID, optionID }
+                    data: { playstoryID, optionID }
                });
 
                if (response.data.success === true) {
@@ -159,14 +168,25 @@ export default function PlaystoryPlayer() {
 
                          setPlaystory(response.data);
                          setReactPlayerProps((previousState) => ({ ...previousState, url: nextVideoURL }));
+                         showHideOptions({ playedSeconds: 0 });
+                         
+                         /* Uncomment the code below and remove every thing above this line to show playstory clip */
+                         /*
+                         const nextClipURL = response.data.to_show_now.data.clip.url;
+                         setPlaystory(response.data);
+                         setReactPlayerProps((previousState) => ({ ...previousState, url: `${VIDEO_SERVER_URL}${nextClipURL}` }));
+                         showHideOptions({ playedSeconds: 0 });
+                         */
                     } else if (response.data.to_show_now.type === "end") {
                          setPlaystory(response.data);
-                         setReactPlayerProps((previousState) => ({ ...previousState, playing: false }));
+                         setReactPlayerProps((previousState) => ({ ...previousState, playing: false, url: "" }));
                          setShowEndScreen(true);
                     }
                }
           } catch (error) {
                console.log(error.message);
+          } finally {
+               setLoading(false);
           }
      }
 
@@ -186,7 +206,19 @@ export default function PlaystoryPlayer() {
                          showHideOptions(event);
                     }}
                     onEnded={videoEnded}
+                    onBuffer={() => {
+                         // show video loader
+                         document.getElementById("video-loader").classList.add("show");
+                    }}
+                    onBufferEnd={() => {
+                         // hide video loader
+                         document.getElementById("video-loader").classList.remove("show");
+                    }}
                />
+
+               <VideoLoader id="video-loader" className="" onClick={pause} onMouseEnter={showControlBar} onMouseOut={hideControlBar}>
+                    <div className="loader"></div>
+               </VideoLoader>
 
                <ControlBar id="control-bar">
                     <RestartButton id="restart-button" onClick={restart} />
@@ -233,7 +265,12 @@ export default function PlaystoryPlayer() {
 
                {showEndScreen && (
                     <EndScreen customStyles={{ videoTextColor: playstory.videoTextColor }}>
-                         {playstory?.to_show_now.data.text || "Interactive video has ended."}
+                         {playstory?.to_show_now.data.show_image && (
+                              <img src={playstory?.to_show_now.data.company_logo} alt={playstory?.company.company_logo} id="company-logo" />
+                         )}
+                         <p id="endscreen-text">{playstory?.to_show_now.data.text || "Interactive video has ended."}</p>
+                         {playstory?.to_show_now.data.show_button && <button id="cta">{playstory?.to_show_now.data.button_text}</button>}
+                         <p id="self-branding">Powered by Playstory.io</p>
                     </EndScreen>
                )}
           </Wrapper>
@@ -377,5 +414,35 @@ const EndScreen = styled.div`
      place-items: center;
 `;
 
-/* video urls */
-// live gaming talk: "https://moctobpltc-i.akamaihd.net/hls/live/571329/eight/playlist.m3u8",
+const VideoLoader = styled.div`
+     position: absolute;
+     inset: 0;
+     background-color: rgba(0, 0, 0, 0.25);
+     display: none;
+     place-items: center;
+     z-index: 1;
+
+     &.show {
+          display: grid;
+     }
+
+     .loader {
+          --size: 50px;
+          --border-size: 5px;
+          width: var(--size);
+          height: var(--size);
+          border-radius: 50%;
+          border: var(--border-size) solid #f3f3f3;
+          border-top-color: #3498db;
+          animation: spin 2s linear infinite;
+     }
+
+     @keyframes spin {
+          0% {
+               transform: rotate(0deg);
+          }
+          100% {
+               transform: rotate(360deg);
+          }
+     }
+`;
