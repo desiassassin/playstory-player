@@ -1,9 +1,13 @@
+playstory not found:
+- show a not found page [pending]
+
 playstory playing:
-- change videos
+- change videos [done]
+- show loader when video is buffering [done]
 
 playstory end:
-- branding stuff,
-- logo stuff,
-- CTA
+- branding stuff [current]
+- logo stuff [pending]
+- CTA [pending]
 
-test in iframe
+test in iframe [done]

@@ -15,7 +15,7 @@ export default Loader;
 const LoaderWrapper = styled.div`
     position: absolute;
     inset: 0;
-    background-color: rgba(255,255,255, 0.4),
+    background-color: rgba(255,255,255, 0.4);
     display: none;
     place-items: center;
     z-index: 100;
