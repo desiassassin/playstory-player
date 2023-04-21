@@ -212,6 +212,7 @@ export default function PlaystoryPlayer() {
                          case "question": {
                               setPlaystory(response.data);
                               setReactPlayerProps((previousState) => ({ ...previousState, url: "" }));
+                              document.getElementById("track-bar").value = 0;
                               break;
                          }
                          case "end": {
@@ -267,16 +268,18 @@ export default function PlaystoryPlayer() {
                     <div className="loader"></div>
                </VideoLoader>
 
-               <ControlBar id="control-bar">
-                    <RestartButton id="restart-button" onClick={restart} />
-                    <input id="trackbar" type="range" min={0} max={1000} step={1} defaultValue={0} onChange={seek} />
-                    {reactPlayerProps.muted ? (
-                         <MutedButton id="muted-button" onClick={toggleMute} />
-                    ) : (
-                         <SoundButton id="sound-button" onClick={toggleMute} />
-                    )}
-                    <FullscreenButton id="fullscreen-button" onClick={toggleFullscreen} />
-               </ControlBar>
+               {playstory?.to_show_now.type === "clip" && (
+                    <ControlBar id="control-bar">
+                         <RestartButton id="restart-button" onClick={restart} />
+                         <input id="trackbar" type="range" min={0} max={1000} step={1} defaultValue={0} onChange={seek} />
+                         {reactPlayerProps.muted ? (
+                              <MutedButton id="muted-button" onClick={toggleMute} />
+                         ) : (
+                              <SoundButton id="sound-button" onClick={toggleMute} />
+                         )}
+                         <FullscreenButton id="fullscreen-button" onClick={toggleFullscreen} />
+                    </ControlBar>
+               )}
 
                {!reactPlayerProps.playing && (
                     <PlayButtonWrapper onClick={play} customStyles={{ color: playstory?.videoTextColor }}>
@@ -320,13 +323,23 @@ export default function PlaystoryPlayer() {
                                         case "Short Text":
                                              return <input type="text" id="answer-input" placeholder="Short Answer" autoFocus spellCheck="false" />;
                                         case "Long Text":
-                                             return <textarea name="" id="answer-input" placeholder="Long Answer" autoFocus spellCheck="false"></textarea>;
+                                             return (
+                                                  <textarea
+                                                       name=""
+                                                       id="answer-input"
+                                                       placeholder="Long Answer"
+                                                       autoFocus
+                                                       spellCheck="false"
+                                                  ></textarea>
+                                             );
                                         case "Email":
-                                             return <input type="text" id="answer-input" placeholder="Your Email"  autoFocus spellCheck="false"/>;
+                                             return <input type="text" id="answer-input" placeholder="Your Email" autoFocus spellCheck="false" />;
                                         case "Phone Number":
-                                             return <input type="text" id="answer-input" placeholder="Your Phone Number"  autoFocus spellCheck="false"/>;
+                                             return (
+                                                  <input type="text" id="answer-input" placeholder="Your Phone Number" autoFocus spellCheck="false" />
+                                             );
                                         case "Website":
-                                             return <input type="text" id="answer-input" placeholder="Your Website"  autoFocus spellCheck="false"/>;
+                                             return <input type="text" id="answer-input" placeholder="Your Website" autoFocus spellCheck="false" />;
                                         default:
                                              return;
                                    }
