@@ -424,7 +424,6 @@ const EndScreen = styled.div`
      flex-direction: column;
      align-items: center;
      justify-content: center;
-     gap: 2rem;
 
      #company-logo {
           position: absolute;
@@ -440,11 +439,16 @@ const EndScreen = styled.div`
      }
 
      #call-to-action-button {
-          border-radius: 10px;
+          border-radius: 100rem;
           margin: 1rem;
-          padding: 1em 2em;
+          padding: 0.5em 1em;
           max-width: 300px;
           cursor: pointer;
+          font-size: 1.25rem;
+          
+          :hover {
+            opacity: 0.75;
+          }
      }
 
      #self-branding {

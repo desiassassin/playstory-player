@@ -5,6 +5,14 @@ playstory playing:
 - change videos [done]
 - show loader when video is buffering [done]
 - trackbar isn't at 0 when video starts for the first time [done]
+- questions
+    - options           [pending]
+    - text              [pending]
+        - short text    [pending]
+        - long text     [pending]
+    - email             [pending]
+    - website           [pending]
+    - phone number      [pending]
 
 playstory end:
 - branding stuff [done]
