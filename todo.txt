@@ -6,13 +6,13 @@ playstory playing:
 - show loader when video is buffering [done]
 - trackbar isn't at 0 when video starts for the first time [done]
 - questions
-    - options           [pending]
-    - text              [pending]
-        - short text    [pending]
-        - long text     [pending]
-    - email             [pending]
-    - website           [pending]
-    - phone number      [pending]
+    - options           [done]
+    - text              [done]
+        - short text    [done]
+        - long text     [done]
+    - email             [done]
+    - website           [done]
+    - phone number      [done]
 
 playstory end:
 - branding stuff [done]

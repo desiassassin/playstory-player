@@ -40,6 +40,7 @@ export default function PlaystoryPlayer() {
                video.onclick = pause;
                video.onmouseenter = showControlBar;
                video.onmouseout = hideControlBar;
+               video.style.objectFit = "cover";
           }
 
           return function () {
@@ -156,11 +157,10 @@ export default function PlaystoryPlayer() {
 
           try {
                let response;
+               const isClip = playstory.to_show_now.type === "clip";
+               const isQuestionWithOptions = playstory.to_show_now.type === "question" && playstory.to_show_now.data.answer_type === "Options";
 
-               if (
-                    playstory.to_show_now.type === "clip" ||
-                    (playstory.to_show_now.type === "question" && playstory.to_show_now.data.answer_type === "Options")
-               ) {
+               if (isClip || isQuestionWithOptions) {
                     // submit option request
                     response = await axios({
                          url: `${BASE_URL}/api/answers-add`,
@@ -202,17 +202,16 @@ export default function PlaystoryPlayer() {
 
                               /* Uncomment the code below and remove every thing above this line to show playstory clip */
                               /*
-                         const nextClipURL = response.data.to_show_now.data.clip.url;
-                         setPlaystory(response.data);
-                         setReactPlayerProps((previousState) => ({ ...previousState, url: `${VIDEO_SERVER_URL}${nextClipURL}` }));
-                         showHideOptions({ playedSeconds: 0 });
-                         */
+                                const nextClipURL = response.data.to_show_now.data.clip.url;
+                                setPlaystory(response.data);
+                                setReactPlayerProps((previousState) => ({ ...previousState, url: `${VIDEO_SERVER_URL}${nextClipURL}` }));
+                                showHideOptions({ playedSeconds: 0 });
+                                */
                               break;
                          }
                          case "question": {
                               setPlaystory(response.data);
                               setReactPlayerProps((previousState) => ({ ...previousState, url: "" }));
-                              document.getElementById("track-bar").value = 0;
                               break;
                          }
                          case "end": {
@@ -242,11 +241,12 @@ export default function PlaystoryPlayer() {
           <Wrapper>
                <Loader loading={loading} />
 
+               {playstory?.to_show_now.type === "clip" && (
                <ReactPlayer
                     ref={PlayerRef}
                     height="100vh"
                     width="100vw"
-                    style={{ overflow: "hidden", zIndex: "1", position: "absolute", objectFit: "cover" }}
+                    style={{ overflow: "hidden", zIndex: "1", position: "absolute", objectFit: "cover", backgroundColor: "black" }}
                     {...reactPlayerProps}
                     onDuration={updateTrackbarOnLoad}
                     onProgress={(event) => {
@@ -263,10 +263,12 @@ export default function PlaystoryPlayer() {
                          document.getElementById("video-loader").classList.remove("show");
                     }}
                />
+               )}
 
-               <VideoLoader id="video-loader" className="" onClick={pause} onMouseEnter={showControlBar} onMouseOut={hideControlBar}>
-                    <div className="loader"></div>
-               </VideoLoader>
+
+                    <VideoLoader id="video-loader" className="" onClick={pause} onMouseEnter={showControlBar} onMouseOut={hideControlBar}>
+                         <div className="loader"></div>
+                    </VideoLoader>
 
                {playstory?.to_show_now.type === "clip" && (
                     <ControlBar id="control-bar">
@@ -373,6 +375,7 @@ export default function PlaystoryPlayer() {
 const Wrapper = styled.div`
      min-height: 100vh;
      position: relative;
+     background: linear-gradient(to right, #d397fa, #8364e8);
 `;
 
 const ControlBar = styled.div`
