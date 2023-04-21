@@ -318,15 +318,15 @@ export default function PlaystoryPlayer() {
                               {(() => {
                                    switch (playstory.to_show_now.data.answer_type) {
                                         case "Short Text":
-                                             return <input type="text" id="answer-input" placeholder="Short Answer"/>;
+                                             return <input type="text" id="answer-input" placeholder="Short Answer" autoFocus spellCheck="false" />;
                                         case "Long Text":
-                                             return <textarea name="" id="answer-input" placeholder="Long Answer"></textarea>;
+                                             return <textarea name="" id="answer-input" placeholder="Long Answer" autoFocus spellCheck="false"></textarea>;
                                         case "Email":
-                                             return <input type="text" id="answer-input" placeholder="Your Email"/>;
+                                             return <input type="text" id="answer-input" placeholder="Your Email"  autoFocus spellCheck="false"/>;
                                         case "Phone Number":
-                                             return <input type="text" id="answer-input" placeholder="Your Phone Number"/>;
+                                             return <input type="text" id="answer-input" placeholder="Your Phone Number"  autoFocus spellCheck="false"/>;
                                         case "Website":
-                                             return <input type="text" id="answer-input" placeholder="Your Website"/>;
+                                             return <input type="text" id="answer-input" placeholder="Your Website"  autoFocus spellCheck="false"/>;
                                         default:
                                              return;
                                    }
@@ -424,11 +424,11 @@ const PlayButtonWrapper = styled.div`
 const Options = styled.div`
      z-index: 2;
      left: 50%;
-     bottom: 20%;
+     bottom: 5%;
      translate: -50%;
      display: none;
      position: absolute;
-     width: clamp(300px, 100%, 1200px);
+     width: clamp(300px, 100%, 650px);
      /* padding-block: 2rem; */
 
      &.show {
@@ -442,13 +442,21 @@ const Options = styled.div`
           color: ${(props) => (props.customStyles.videoTextColor ? props.customStyles.videoTextColor : "white")};
           font-size: 1.5rem;
           pointer-events: none;
+          text-shadow: 0px 0px 5px rgb(128, 128, 128);
      }
 
      #options {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+          row-gap: 1rem;
+          column-gap: 2rem;
           padding-inline: 1rem;
-          gap: 1rem;
+          /* display: flex;
+          justify-content: left;
+          flex-wrap: wrap;
+          padding-inline: 1rem;
+          row-gap: 1rem;
+          column-gap: 2rem; */
 
           .option {
                display: flex;
@@ -456,7 +464,7 @@ const Options = styled.div`
                gap: 1rem;
                width: 275px;
                background-color: ${(props) => (props.customStyles.backgroundColor ? props.customStyles.backgroundColor : "black")};
-               padding: 0.25rem 1rem;
+               padding: 0.5rem 1rem;
                border-radius: 100px;
                margin: auto;
                opacity: ${(props) => (props.customStyles.opacity ? props.customStyles.opacity : 1)};
@@ -589,14 +597,16 @@ const QuestionForm = styled.form`
           position: relative;
 
           input,
-          button, textarea {
+          button,
+          textarea {
                position: absolute;
                outline: none;
                border: none;
                font-size: 2rem;
           }
 
-          input, textarea {
+          input,
+          textarea {
                border-bottom: 2px solid black;
                right: 2rem;
                left: 2rem;
@@ -605,11 +615,12 @@ const QuestionForm = styled.form`
           }
 
           textarea {
-            resize: vertical;
-            box-shadow: 1px 1px 5px black;
-            border-radius: 20px;
-            padding: 1rem;
-            font-size: 1.5rem;
+               resize: vertical;
+               box-shadow: 1px 1px 5px black;
+               border-radius: 20px;
+               padding: 1rem;
+               font-size: 1.5rem;
+               min-height: 50%;
           }
 
           button {
