@@ -147,40 +147,82 @@ export default function PlaystoryPlayer() {
 
      async function submitAnswer(event) {
           const { id: optionID } = event.currentTarget.dataset;
-          const { playstoryID } = playstory;
+          const { playstoryID, uniqueID } = playstory;
 
           setLoading(true);
 
           try {
-               const response = await axios({
-                    url: `${BASE_URL}/api/answers-add`,
-                    method: "POST",
-                    data: { playstoryID, optionID }
-               });
+               let response;
+
+               if (
+                    playstory.to_show_now.type === "clip" ||
+                    (playstory.to_show_now.type === "question" && playstory.to_show_now.data.answer_type === "Options")
+               ) {
+                    console.log("submitting normal answer");
+                    // submit option request
+                    response = await axios({
+                         url: `${BASE_URL}/api/answers-add`,
+                         method: "POST",
+                         data: { playstoryID, optionID, uniqueID }
+                    });
+               } else {
+                    console.log("submitting special answer");
+                    const answer = document.getElementById("answer-input").value;
+                    // submit answer request
+                    response = await axios({
+                         url: `${BASE_URL}/api/answers-add`,
+                         method: "POST",
+                         data: {
+                              uniqueID,
+                              playstoryID,
+                              type: "question",
+                              questionID: playstory.to_show_now.id,
+                              question: playstory.to_show_now.data.question,
+                              answerType: playstory.to_show_now.data.answer_type,
+                              answer
+                         }
+                    });
+               }
 
                if (response.data.success === true) {
-                    if (response.data.to_show_now.type === "clip") {
-                         const { url: currentVideoURL } = reactPlayerProps;
-                         const nextURLs = VIDEOS.filter((videoURL) => videoURL !== currentVideoURL);
-                         const nextVideoURL = nextURLs[Math.floor(Math.random() * nextURLs.length)];
+                    const type = response.data.to_show_now.type;
 
-                         response.data.to_show_now.data.clip.url = nextVideoURL;
+                    switch (type) {
+                         case "clip": {
+                              const { url: currentVideoURL } = reactPlayerProps;
+                              const nextURLs = VIDEOS.filter((videoURL) => videoURL !== currentVideoURL);
+                              const nextVideoURL = nextURLs[Math.floor(Math.random() * nextURLs.length)];
 
-                         setPlaystory(response.data);
-                         setReactPlayerProps((previousState) => ({ ...previousState, url: nextVideoURL }));
-                         showHideOptions({ playedSeconds: 0 });
+                              response.data.to_show_now.data.clip.url = nextVideoURL;
 
-                         /* Uncomment the code below and remove every thing above this line to show playstory clip */
-                         /*
+                              setPlaystory(response.data);
+                              setReactPlayerProps((previousState) => ({ ...previousState, url: nextVideoURL }));
+                              showHideOptions({ playedSeconds: 0 });
+
+                              /* Uncomment the code below and remove every thing above this line to show playstory clip */
+                              /*
                          const nextClipURL = response.data.to_show_now.data.clip.url;
                          setPlaystory(response.data);
                          setReactPlayerProps((previousState) => ({ ...previousState, url: `${VIDEO_SERVER_URL}${nextClipURL}` }));
                          showHideOptions({ playedSeconds: 0 });
                          */
-                    } else if (response.data.to_show_now.type === "end") {
-                         setPlaystory(response.data);
-                         setReactPlayerProps((previousState) => ({ ...previousState, playing: false, url: "" }));
-                         setShowEndScreen(true);
+                              break;
+                         }
+                         case "question": {
+                              console.log("question data recieved", response.data.to_show_now);
+                              setPlaystory(response.data);
+                              setReactPlayerProps((previousState) => ({ ...previousState, url: "" }));
+                              break;
+                         }
+                         case "end": {
+                              setPlaystory(response.data);
+                              setReactPlayerProps((previousState) => ({ ...previousState, playing: false, url: "" }));
+                              setShowEndScreen(true);
+                              break;
+                         }
+                         default: {
+                              console.log("Unexpected playstory type recieved");
+                         }
                     }
                }
           } catch (error) {
@@ -254,17 +296,32 @@ export default function PlaystoryPlayer() {
                          videoTextColor: playstory?.videoTextColor
                     }}
                >
-                    <h1 id="video-heading">{playstory?.to_show_now.data.video_title}</h1>
+                    <h1 id="video-heading">{playstory?.to_show_now.data.video_title || playstory?.to_show_now.data.question}</h1>
                     <div id="options">
-                         {playstory?.to_show_now.type !== "end" &&
+                         {/* {playstory?.to_show_now.type !== "end" &&
                               playstory?.to_show_now.data.options.map(({ id, value }, index) => {
                                    return (
-                                        <div key={id} className="option" onClick={submitAnswer} data-id={id}>
+                                        <div key={id} className="option" onClick={submitAnswer} data-id={id} data-value={value}>
+                                             <span className="option-number">{index + 1}</span>
+                                             <p className="option-title">{value}</p>
+                                        </div>
+                                   );
+                              })} */}
+                         {playstory?.to_show_now.data.hasOwnProperty("options") &&
+                              playstory?.to_show_now.data.options.map(({ id, value }, index) => {
+                                   return (
+                                        <div key={id} className="option" onClick={submitAnswer} data-id={id} data-value={value}>
                                              <span className="option-number">{index + 1}</span>
                                              <p className="option-title">{value}</p>
                                         </div>
                                    );
                               })}
+                         {["Short Text", "Long Text", "Email", "Phone Number", "Website"].includes(playstory?.to_show_now.data.answer_type) && (
+                              <div id="answer-form">
+                                   <input type="text" id="answer-input" />
+                                   <button id="answer-submit" onClick={submitAnswer}>Submit</button>
+                              </div>
+                         )}
                     </div>
                </Options>
 
@@ -445,9 +502,9 @@ const EndScreen = styled.div`
           max-width: 300px;
           cursor: pointer;
           font-size: 1.25rem;
-          
+
           :hover {
-            opacity: 0.75;
+               opacity: 0.75;
           }
      }
 
