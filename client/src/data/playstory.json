@@ -1,0 +1,87 @@
+{
+     "success": true,
+     "to_show_now": {
+          "id": "root-node",
+          "type": "clip",
+          "count": 0,
+          "sourcePosition": "right",
+          "targetPosition": "left",
+          "position": {
+               "x": -186.47034947146733,
+               "y": 94.32923767815413
+          },
+          "data": {
+               "text": "",
+               "options": [
+                    {
+                         "id": "opt-cujibolzja",
+                         "value": "Fish"
+                    },
+                    {
+                         "id": "opt-siqa4za2oi",
+                         "value": "Questions"
+                    }
+               ],
+               "video_title": "Noise Heading",
+               "show_after_percent": "1",
+               "clip": {
+                    "_id": "643e84ec858352949b2b2575",
+                    "user_id": "643e7fe2858352949b2b20db",
+                    "company_id": "643e7fe1858352949b2b20d9",
+                    "project_id": "643e842d858352949b2b24d9",
+                    "playstory_id": null,
+                    "video_id": "643e84ec858352949b2b2573",
+                    "clip_name": "noiseclip",
+                    "clip_duration": 20,
+                    "clip_size": 10542.66796875,
+                    "updated_date": 1681817521682,
+                    "start_time": 0,
+                    "end_time": 20,
+                    "created_date": 1681818860196,
+                    "url": "/4b60bfe3-dcb1-4a02-b1f2-b24fffc6f082/video.m3u8",
+                    "deleted": false,
+                    "processing": true,
+                    "testing": true,
+                    "__v": 0
+               },
+               "error": false,
+               "loop_video": false
+          },
+          "width": 210,
+          "height": 429,
+          "selected": false,
+          "positionAbsolute": {
+               "x": -186.47034947146733,
+               "y": 94.32923767815413
+          },
+          "dragging": true
+     },
+     "uniqueID": "d172ab31-c80f-413d-84f0-dd4101085ba1",
+     "playstoryID": "643e843e858352949b2b24e7",
+     "textColor": "#ffffff",
+     "btnColor": "#d51ebb",
+     "remove_branding": true,
+     "welcomeText": "Play this playstory and tell me how is it?",
+     "company": {
+          "_id": "643e7fe1858352949b2b20d9",
+          "coupons": [],
+          "company_name": "Design Script",
+          "company_description": "",
+          "company_logo": "https://salesblink.io/images/branding/logo-dark.png",
+          "company_favicon": "",
+          "company_custom_domain_link": "",
+          "company_custom_domain_verified": false,
+          "billing_required": false,
+          "active": 1,
+          "updated_date": 1681817521663,
+          "created_date": 1681817521663,
+          "referral_code": "",
+          "referred_count": 0,
+          "__v": 0
+     },
+     "playstory_name": "First Playstory Test",
+     "width": "100%",
+     "btnOpacity": 1,
+     "videoTextColor": "#ffffff",
+     "clip_present": true
+}

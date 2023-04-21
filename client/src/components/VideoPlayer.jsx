@@ -146,41 +146,83 @@ export default function PlaystoryPlayer() {
      }
 
      async function submitAnswer(event) {
+          event.preventDefault();
+          event.stopPropagation();
+
           const { id: optionID } = event.currentTarget.dataset;
-          const { playstoryID } = playstory;
+          const { playstoryID, uniqueID } = playstory;
 
           setLoading(true);
 
           try {
-               const response = await axios({
-                    url: `${BASE_URL}/api/answers-add`,
-                    method: "POST",
-                    data: { playstoryID, optionID }
-               });
+               let response;
+
+               if (
+                    playstory.to_show_now.type === "clip" ||
+                    (playstory.to_show_now.type === "question" && playstory.to_show_now.data.answer_type === "Options")
+               ) {
+                    // submit option request
+                    response = await axios({
+                         url: `${BASE_URL}/api/answers-add`,
+                         method: "POST",
+                         data: { playstoryID, optionID, uniqueID }
+                    });
+               } else {
+                    const answer = document.getElementById("answer-input").value;
+                    // submit answer request
+                    response = await axios({
+                         url: `${BASE_URL}/api/answers-add`,
+                         method: "POST",
+                         data: {
+                              uniqueID,
+                              playstoryID,
+                              type: "question",
+                              questionID: playstory.to_show_now.id,
+                              question: playstory.to_show_now.data.question,
+                              answerType: playstory.to_show_now.data.answer_type,
+                              answer
+                         }
+                    });
+               }
 
                if (response.data.success === true) {
-                    if (response.data.to_show_now.type === "clip") {
-                         const { url: currentVideoURL } = reactPlayerProps;
-                         const nextURLs = VIDEOS.filter((videoURL) => videoURL !== currentVideoURL);
-                         const nextVideoURL = nextURLs[Math.floor(Math.random() * nextURLs.length)];
+                    const type = response.data.to_show_now.type;
 
-                         response.data.to_show_now.data.clip.url = nextVideoURL;
+                    switch (type) {
+                         case "clip": {
+                              const { url: currentVideoURL } = reactPlayerProps;
+                              const nextURLs = VIDEOS.filter((videoURL) => videoURL !== currentVideoURL);
+                              const nextVideoURL = nextURLs[Math.floor(Math.random() * nextURLs.length)];
 
-                         setPlaystory(response.data);
-                         setReactPlayerProps((previousState) => ({ ...previousState, url: nextVideoURL }));
-                         showHideOptions({ playedSeconds: 0 });
+                              response.data.to_show_now.data.clip.url = nextVideoURL;
 
-                         /* Uncomment the code below and remove every thing above this line to show playstory clip */
-                         /*
+                              setPlaystory(response.data);
+                              setReactPlayerProps((previousState) => ({ ...previousState, url: nextVideoURL }));
+                              showHideOptions({ playedSeconds: 0 });
+
+                              /* Uncomment the code below and remove every thing above this line to show playstory clip */
+                              /*
                          const nextClipURL = response.data.to_show_now.data.clip.url;
                          setPlaystory(response.data);
                          setReactPlayerProps((previousState) => ({ ...previousState, url: `${VIDEO_SERVER_URL}${nextClipURL}` }));
                          showHideOptions({ playedSeconds: 0 });
                          */
-                    } else if (response.data.to_show_now.type === "end") {
-                         setPlaystory(response.data);
-                         setReactPlayerProps((previousState) => ({ ...previousState, playing: false, url: "" }));
-                         setShowEndScreen(true);
+                              break;
+                         }
+                         case "question": {
+                              setPlaystory(response.data);
+                              setReactPlayerProps((previousState) => ({ ...previousState, url: "" }));
+                              break;
+                         }
+                         case "end": {
+                              setPlaystory(response.data);
+                              setReactPlayerProps((previousState) => ({ ...previousState, playing: false, url: "" }));
+                              setShowEndScreen(true);
+                              break;
+                         }
+                         default: {
+                              console.error(new Error("Unexpected playstory type recieved"));
+                         }
                     }
                }
           } catch (error) {
@@ -253,13 +295,14 @@ export default function PlaystoryPlayer() {
                          color: playstory?.textColor,
                          videoTextColor: playstory?.videoTextColor
                     }}
+                    onClick={pause}
                >
-                    <h1 id="video-heading">{playstory?.to_show_now.data.video_title}</h1>
+                    <h1 id="video-heading">{playstory?.to_show_now.data.video_title || playstory?.to_show_now.data.question}</h1>
                     <div id="options">
-                         {playstory?.to_show_now.type !== "end" &&
+                         {playstory?.to_show_now.data.hasOwnProperty("options") &&
                               playstory?.to_show_now.data.options.map(({ id, value }, index) => {
                                    return (
-                                        <div key={id} className="option" onClick={submitAnswer} data-id={id}>
+                                        <div key={id} className="option" onClick={submitAnswer} data-id={id} data-value={value}>
                                              <span className="option-number">{index + 1}</span>
                                              <p className="option-title">{value}</p>
                                         </div>
@@ -267,6 +310,33 @@ export default function PlaystoryPlayer() {
                               })}
                     </div>
                </Options>
+
+               {["Short Text", "Long Text", "Email", "Phone Number", "Website"].includes(playstory?.to_show_now.data.answer_type) && (
+                    <QuestionForm id="answer-form">
+                         <h1>{playstory?.to_show_now.data.question}</h1>
+                         <div className="form-control" onSubmit={submitAnswer}>
+                              {(() => {
+                                   switch (playstory.to_show_now.data.answer_type) {
+                                        case "Short Text":
+                                             return <input type="text" id="answer-input" placeholder="Short Answer"/>;
+                                        case "Long Text":
+                                             return <textarea name="" id="answer-input" placeholder="Long Answer"></textarea>;
+                                        case "Email":
+                                             return <input type="text" id="answer-input" placeholder="Your Email"/>;
+                                        case "Phone Number":
+                                             return <input type="text" id="answer-input" placeholder="Your Phone Number"/>;
+                                        case "Website":
+                                             return <input type="text" id="answer-input" placeholder="Your Website"/>;
+                                        default:
+                                             return;
+                                   }
+                              })()}
+                              <button id="answer-submit" onClick={submitAnswer}>
+                                   Submit
+                              </button>
+                         </div>
+                    </QuestionForm>
+               )}
 
                {showEndScreen && (
                     <EndScreen customStyles={{ videoTextColor: playstory.videoTextColor }}>
@@ -445,9 +515,9 @@ const EndScreen = styled.div`
           max-width: 300px;
           cursor: pointer;
           font-size: 1.25rem;
-          
+
           :hover {
-            opacity: 0.75;
+               opacity: 0.75;
           }
      }
 
@@ -488,6 +558,69 @@ const VideoLoader = styled.div`
           }
           100% {
                transform: rotate(360deg);
+          }
+     }
+`;
+
+const QuestionForm = styled.form`
+     position: absolute;
+     z-index: 3;
+     inset: 0;
+     background: linear-gradient(to right, #b597f6, #96c6ea);
+
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     gap: 2rem;
+
+     h1 {
+          max-width: 50%;
+          font-size: 2rem;
+          padding: 1rem 1rem 1rem 2rem;
+          color: white;
+     }
+
+     .form-control {
+          border-radius: 20px;
+          margin-inline: 1rem;
+          width: clamp(300px, 100%, 50%);
+          height: calc(100% - 2rem);
+          background-color: #fff;
+          position: relative;
+
+          input,
+          button, textarea {
+               position: absolute;
+               outline: none;
+               border: none;
+               font-size: 2rem;
+          }
+
+          input, textarea {
+               border-bottom: 2px solid black;
+               right: 2rem;
+               left: 2rem;
+               top: 50%;
+               transform: translateY(-50%);
+          }
+
+          textarea {
+            resize: vertical;
+            box-shadow: 1px 1px 5px black;
+            border-radius: 20px;
+            padding: 1rem;
+            font-size: 1.5rem;
+          }
+
+          button {
+               bottom: 1rem;
+               right: 1rem;
+               padding: 0.5em 2em;
+               border-radius: 10px;
+               font-size: 1.5rem;
+               background: linear-gradient(to right, #b597f6, #96c6ea);
+               cursor: pointer;
+               color: white;
           }
      }
 `;
