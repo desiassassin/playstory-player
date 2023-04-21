@@ -1,0 +1,74 @@
+{
+     "success": true,
+     "to_show_now": {
+          "id": "horizontal-4opka2r9j",
+          "type": "end",
+          "sourcePosition": "right",
+          "targetPosition": "left",
+          "position": {
+               "x": 1185.9964302224287,
+               "y": 700.6470226609155
+          },
+          "data": {
+               "label": {
+                    "type": "div",
+                    "key": null,
+                    "ref": null,
+                    "props": {
+                         "children": {
+                              "type": "h1",
+                              "key": null,
+                              "ref": null,
+                              "props": {
+                                   "children": "End Screen"
+                              },
+                              "_owner": null
+                         }
+                    },
+                    "_owner": null
+               },
+               "text": "Made with Playstory",
+               "company_logo": "https://salesblink.io/images/branding/logo-dark.png",
+               "show_image": true,
+               "show_button": true,
+               "button_text": "Create Interactive Video",
+               "button_link": "https://playstory.io",
+               "error": false
+          },
+          "width": 210,
+          "height": 286,
+          "selected": true,
+          "positionAbsolute": {
+               "x": 1185.9964302224287,
+               "y": 700.6470226609155
+          },
+          "dragging": true
+     },
+     "playstoryID": "643e843e858352949b2b24e7",
+     "textColor": "#ffffff",
+     "btnColor": "#d51ebb",
+     "remove_branding": true,
+     "welcomeText": "",
+     "company": {
+          "_id": "643e7fe1858352949b2b20d9",
+          "coupons": [],
+          "company_name": "Design Script",
+          "company_description": "",
+          "company_logo": "https://salesblink.io/images/branding/logo-dark.png",
+          "company_favicon": "",
+          "company_custom_domain_link": "",
+          "company_custom_domain_verified": false,
+          "billing_required": false,
+          "active": 1,
+          "updated_date": 1681817521663,
+          "created_date": 1681817521663,
+          "referral_code": "",
+          "referred_count": 0,
+          "__v": 0
+     },
+     "playstory_name": "First Playstory Test",
+     "btnOpacity": 1,
+     "videoTextColor": "#ffffff",
+     "clip_present": true,
+     "not_first": true
+}
