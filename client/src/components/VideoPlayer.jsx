@@ -222,7 +222,7 @@ export default function PlaystoryPlayer() {
 
                <ControlBar id="control-bar">
                     <RestartButton id="restart-button" onClick={restart} />
-                    <input id="trackbar" type="range" min={0} max={1000} step={1} onChange={seek} />
+                    <input id="trackbar" type="range" min={0} max={1000} step={1} defaultValue={0} onChange={seek} />
                     {reactPlayerProps.muted ? (
                          <MutedButton id="muted-button" onClick={toggleMute} />
                     ) : (
