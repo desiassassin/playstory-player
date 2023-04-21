@@ -169,7 +169,7 @@ export default function PlaystoryPlayer() {
                          setPlaystory(response.data);
                          setReactPlayerProps((previousState) => ({ ...previousState, url: nextVideoURL }));
                          showHideOptions({ playedSeconds: 0 });
-                         
+
                          /* Uncomment the code below and remove every thing above this line to show playstory clip */
                          /*
                          const nextClipURL = response.data.to_show_now.data.clip.url;
@@ -188,6 +188,11 @@ export default function PlaystoryPlayer() {
           } finally {
                setLoading(false);
           }
+     }
+
+     function handleCallToAction(event) {
+          const { url } = event.target.dataset;
+          window.open(url);
      }
 
      return (
@@ -266,10 +271,15 @@ export default function PlaystoryPlayer() {
                {showEndScreen && (
                     <EndScreen customStyles={{ videoTextColor: playstory.videoTextColor }}>
                          {playstory?.to_show_now.data.show_image && (
-                              <img src={playstory?.to_show_now.data.company_logo} alt={playstory?.company.company_logo} id="company-logo" />
+                              <img id="company-logo" src={playstory?.to_show_now.data.company_logo} alt={playstory?.company.company_logo} />
                          )}
+
                          <p id="endscreen-text">{playstory?.to_show_now.data.text || "Interactive video has ended."}</p>
-                         {playstory?.to_show_now.data.show_button && <button id="cta">{playstory?.to_show_now.data.button_text}</button>}
+                         {playstory?.to_show_now.data.show_button && (
+                              <button id="call-to-action-button" onClick={handleCallToAction} data-url={playstory?.to_show_now.data.button_link}>
+                                   {playstory?.to_show_now.data.button_text}
+                              </button>
+                         )}
                          <p id="self-branding">Powered by Playstory.io</p>
                     </EndScreen>
                )}
@@ -410,8 +420,39 @@ const EndScreen = styled.div`
      backdrop-filter: blur(50px);
      background-color: rgba(0, 0, 0, 0.9);
      color: ${(props) => (props.customStyles.videoTextColor ? props.customStyles.videoTextColor : "white")};
-     display: grid;
-     place-items: center;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     gap: 2rem;
+
+     #company-logo {
+          position: absolute;
+          top: 0rem;
+          max-width: 300px;
+          padding: 2rem;
+     }
+
+     #endscreen-text {
+          max-width: 900px;
+          text-align: center;
+          padding: 1rem;
+     }
+
+     #call-to-action-button {
+          border-radius: 10px;
+          margin: 1rem;
+          padding: 1em 2em;
+          max-width: 300px;
+          cursor: pointer;
+     }
+
+     #self-branding {
+          position: absolute;
+          bottom: 0;
+          opacity: 0.75;
+          font-size: 0.75rem;
+     }
 `;
 
 const VideoLoader = styled.div`

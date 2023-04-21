@@ -4,10 +4,11 @@ playstory not found:
 playstory playing:
 - change videos [done]
 - show loader when video is buffering [done]
+- trackbar isn't at 0 when video starts for the first time [done]
 
 playstory end:
-- branding stuff [current]
-- logo stuff [pending]
-- CTA [pending]
+- branding stuff [done]
+- logo stuff [done]
+- CTA [done]
 
 test in iframe [done]
