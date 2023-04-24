@@ -185,6 +185,12 @@ export default function PlaystoryPlayer() {
                               setReactPlayerProps((previousState) => ({ ...previousState, url: "" }));
                               break;
                          }
+                         case "link": {
+                              const url = response.data.to_show_now.data.link;
+                              setReactPlayerProps((previousState) => ({ ...previousState, playing: false }));
+                              window.open(url);
+                              break;
+                         }
                          case "end": {
                               setPlaystory(response.data);
                               setReactPlayerProps((previousState) => ({ ...previousState, playing: false, url: "" }));
