@@ -12,12 +12,6 @@ import { ReactComponent as SoundButton } from "../assets/svg/soundButton.svg";
 import Loader from "./Loader";
 import { useRef } from "react";
 
-const VIDEOS = [
-     "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8",
-     "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8",
-     "http://d3rlna7iyyu8wu.cloudfront.net/skip_armstrong/skip_armstrong_multi_language_subs.m3u8"
-];
-
 export default function PlaystoryPlayer() {
      const { playstoryID } = useParams();
      const [playstory, setPlaystory] = useState();
@@ -59,22 +53,12 @@ export default function PlaystoryPlayer() {
                          const response = await axios({ url: `${BASE_URL}/api/playstory/${playstoryID}`, method: "GET" });
 
                          if (response.data.success === true) {
-                              response.data.to_show_now.data.clip.url = VIDEOS[Math.floor(Math.random() * VIDEOS.length)];
+                              const nextClipURL = response.data.to_show_now.data.clip.url;
                               setPlaystory(response.data);
-                              setReactPlayerProps((previousState) => ({ ...previousState, url: response.data.to_show_now.data.clip.url }));
+                              setReactPlayerProps((previousState) => ({ ...previousState, url: `${VIDEO_SERVER_URL}${nextClipURL}` }));
 
                               // show the welcome text
                               document.getElementById("welcome-text").classList.remove("hidden");
-
-                              /* Uncomment the code below and remove every thing above this line to show playstory clip */
-                              /*
-                                const nextClipURL = response.data.to_show_now.data.clip.url;
-                                setPlaystory(response.data);
-                                setReactPlayerProps((previousState) => ({ ...previousState, url: `${VIDEO_SERVER_URL}${nextClipURL}` }));
-
-                                // show the welcome text
-                                document.getElementById("welcome-text").classList.remove("hidden");
-                                */
                          }
                     } catch (error) {
                          console.log(error.message);
@@ -190,23 +174,10 @@ export default function PlaystoryPlayer() {
 
                     switch (type) {
                          case "clip": {
-                              const { url: currentVideoURL } = reactPlayerProps;
-                              const nextURLs = VIDEOS.filter((videoURL) => videoURL !== currentVideoURL);
-                              const nextVideoURL = nextURLs[Math.floor(Math.random() * nextURLs.length)];
-
-                              response.data.to_show_now.data.clip.url = nextVideoURL;
-
+                              const nextClipURL = response.data.to_show_now.data.clip.url;
                               setPlaystory(response.data);
-                              setReactPlayerProps((previousState) => ({ ...previousState, url: nextVideoURL }));
+                              setReactPlayerProps((previousState) => ({ ...previousState, url: `${VIDEO_SERVER_URL}${nextClipURL}` }));
                               showHideOptions({ playedSeconds: 0 });
-
-                              /* Uncomment the code below and remove every thing above this line to show playstory clip */
-                              /*
-                                const nextClipURL = response.data.to_show_now.data.clip.url;
-                                setPlaystory(response.data);
-                                setReactPlayerProps((previousState) => ({ ...previousState, url: `${VIDEO_SERVER_URL}${nextClipURL}` }));
-                                showHideOptions({ playedSeconds: 0 });
-                                */
                               break;
                          }
                          case "question": {
@@ -242,33 +213,32 @@ export default function PlaystoryPlayer() {
                <Loader loading={loading} />
 
                {playstory?.to_show_now.type === "clip" && (
-               <ReactPlayer
-                    ref={PlayerRef}
-                    height="100vh"
-                    width="100vw"
-                    style={{ overflow: "hidden", zIndex: "1", position: "absolute", objectFit: "cover", backgroundColor: "black" }}
-                    {...reactPlayerProps}
-                    onDuration={updateTrackbarOnLoad}
-                    onProgress={(event) => {
-                         updateTrackbar(event);
-                         showHideOptions(event);
-                    }}
-                    onEnded={videoEnded}
-                    onBuffer={() => {
-                         // show video loader
-                         document.getElementById("video-loader").classList.add("show");
-                    }}
-                    onBufferEnd={() => {
-                         // hide video loader
-                         document.getElementById("video-loader").classList.remove("show");
-                    }}
-               />
+                    <ReactPlayer
+                         ref={PlayerRef}
+                         height="100vh"
+                         width="100vw"
+                         style={{ overflow: "hidden", zIndex: "1", position: "absolute", objectFit: "cover", backgroundColor: "black" }}
+                         {...reactPlayerProps}
+                         onDuration={updateTrackbarOnLoad}
+                         onProgress={(event) => {
+                              updateTrackbar(event);
+                              showHideOptions(event);
+                         }}
+                         onEnded={videoEnded}
+                         onBuffer={() => {
+                              // show video loader
+                              document.getElementById("video-loader").classList.add("show");
+                         }}
+                         onBufferEnd={() => {
+                              // hide video loader
+                              document.getElementById("video-loader").classList.remove("show");
+                         }}
+                    />
                )}
 
-
-                    <VideoLoader id="video-loader" className="" onClick={pause} onMouseEnter={showControlBar} onMouseOut={hideControlBar}>
-                         <div className="loader"></div>
-                    </VideoLoader>
+               <VideoLoader id="video-loader" className="" onClick={pause} onMouseEnter={showControlBar} onMouseOut={hideControlBar}>
+                    <div className="loader"></div>
+               </VideoLoader>
 
                {playstory?.to_show_now.type === "clip" && (
                     <ControlBar id="control-bar">
