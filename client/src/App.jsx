@@ -6,6 +6,7 @@ function App() {
           <Router>
                <Routes>
                     <Route path=":playstoryID" element={<PlaystoryPlayer />}></Route>
+                    <Route path="*" element={<h1>404 page not found</h1>}/>
                </Routes>
           </Router>
      );
